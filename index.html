@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مصحّح أوراق الإجابة</title>
+<meta name="theme-color" content="#2343C4">
+<meta name="description" content="تصحيح أوراق الببل شيت بكاميرا التليفون وتصدير الدرجات إلى Excel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مصحّح الببل">
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="img/logo.js"></script>
+<style>
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/readex-pro-arabic-400-normal.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/readex-pro-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/readex-pro-arabic-500-normal.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/readex-pro-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/readex-pro-arabic-600-normal.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/readex-pro-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/readex-pro-arabic-700-normal.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:'Readex Pro';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/readex-pro-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{
+  --bg:#EAEEF2;--paper:#FFFFFF;--ink:#16202F;--muted:#5A6477;--line:#D3D9E1;--soft:#F3F5F8;
+  --mark:#2343C4;--mark-soft:#E3E8FB;--ok:#1B7A4A;--ok-soft:#E1F3E9;--bad:#C0392B;--bad-soft:#FBE6E3;--warn:#A86A12;--warn-soft:#FBF0DD;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10141B;--paper:#181E28;--ink:#E6EAF0;--muted:#98A2B3;--line:#2B3441;--soft:#1F2632;
+  --mark:#7E96FF;--mark-soft:#232C4A;--ok:#4DC48A;--ok-soft:#173127;--bad:#F2786C;--bad-soft:#3A1E1C;--warn:#E3AA4C;--warn-soft:#3A2C15;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#10141B;--paper:#181E28;--ink:#E6EAF0;--muted:#98A2B3;--line:#2B3441;--soft:#1F2632;
+  --mark:#7E96FF;--mark-soft:#232C4A;--ok:#4DC48A;--ok-soft:#173127;--bad:#F2786C;--bad-soft:#3A1E1C;--warn:#E3AA4C;--warn-soft:#3A2C15;color-scheme:dark;}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Readex Pro","Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+img,canvas{max-width:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 48px}
+.top{display:flex;align-items:center;gap:12px;padding:20px 0 14px}
+.top h1{font-size:1.35rem;font-weight:700;margin:0;line-height:1.2;letter-spacing:-.01em}
+.top p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.logo{flex:none}
+
+.steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--bg);padding:8px 0 10px;margin-bottom:6px}
+.step{display:flex;align-items:center;gap:8px;justify-content:center;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 8px;font-size:.88rem;font-weight:500;color:var(--muted)}
+.step .dot{width:24px;height:24px;border-radius:50%;border:1.6px solid currentColor;display:grid;place-items:center;font-size:.8rem;flex:none;transition:background .2s,color .2s}
+.step[aria-selected="true"]{color:var(--ink);border-color:var(--mark)}
+.step[aria-selected="true"] .dot{background:var(--mark);border-color:var(--mark);color:#fff}
+@media (max-width:420px){.step{flex-direction:column;gap:3px;border-radius:14px;font-size:.78rem;padding:7px 4px}}
+
+section[hidden]{display:none}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
+.card h2{font-size:1.05rem;margin:0 0 4px;font-weight:600}
+.card .sub{color:var(--muted);font-size:.87rem;margin:0 0 14px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields .full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:.85rem;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],textarea{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:9px 11px;font-size:1rem;color:var(--ink)}
+textarea{min-height:120px;resize:vertical;line-height:1.7}
+input:disabled{opacity:.55}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft)}
+.seg button{flex:1;border:0;background:transparent;padding:9px 6px;font-size:.95rem}
+.seg button[aria-pressed="true"]{background:var(--mark);color:#fff}
+.seg button:disabled{opacity:.5;cursor:not-allowed}
+.note{font-size:.85rem;border-radius:10px;padding:10px 12px;margin:12px 0 0;background:var(--warn-soft);color:var(--warn)}
+.note.info{background:var(--mark-soft);color:var(--mark)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 14px;font-weight:500;font-size:.95rem}
+.btn.primary{background:var(--mark);border-color:var(--mark);color:#fff}
+.btn.big{padding:16px;font-size:1.02rem;border-radius:12px;width:100%}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--mark);padding:8px 10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.split>*{flex:1 1 180px}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+
+.preview{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.preview canvas{width:100%;max-width:300px;border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 0 var(--line);background:#fff}
+.preview .side{flex:1 1 220px}
+.preview .side p{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+
+.keyhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.meter{font-size:.9rem;color:var(--muted)}
+.meter b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:4px 14px}
+.qrow{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:8px}
+.qrow .n{width:26px;font-size:.82rem;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums;flex:none}
+.opts{display:flex;gap:4px}
+.opts.ltr{direction:ltr}
+.o{width:29px;height:29px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-size:.8rem;display:grid;place-items:center;padding:0;color:var(--muted);flex:none}
+.o.sel{background:var(--mark);border-color:var(--mark);color:#fff}
+.o.key{box-shadow:0 0 0 2px var(--ok) inset}
+.qrow.bad .o.sel{background:var(--bad);border-color:var(--bad)}
+.qrow.good .o.sel{background:var(--ok);border-color:var(--ok)}
+.qrow.multi{background:var(--warn-soft)}
+.qrow.blank .n{color:var(--warn)}
+.qrow.missing{background:var(--bad-soft)}.qrow.missing .n{color:var(--bad);font-weight:700}
+label.f.invalid input,label.f.invalid textarea,label.f.invalid select{border-color:var(--bad);background:var(--bad-soft)}
+.ferr{display:block;color:var(--bad);font-size:.8rem;margin-top:2px}
+.step.blocked{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.step.blocked{animation:none}}
+.guard{position:fixed;inset:0;z-index:25;background:rgba(10,14,20,.5);display:flex;align-items:center;justify-content:center;padding:16px}
+.guard[hidden]{display:none}
+.guard .gbox{background:var(--paper);border-radius:16px;max-width:440px;width:100%;padding:18px;border-top:4px solid var(--warn)}
+.guard.block .gbox{border-top-color:var(--bad)}
+.guard h3{margin:0 0 6px;font-size:1.05rem}
+.guard p{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.guard .row{justify-content:flex-end}
+
+.tips{color:var(--muted);font-size:.87rem;margin:12px 0 0;padding-inline-start:18px}
+.tips li{margin:3px 0}
+.progress{margin-top:12px;font-size:.92rem;color:var(--mark)}
+.errs{margin-top:10px}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:9px 12px;font-size:.87rem;margin-top:6px}
+
+.list{display:flex;flex-direction:column}
+.item{display:flex;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);background:none;border-inline:0;border-top:0;text-align:start;width:100%}
+.item:last-child{border-bottom:0}
+.thumb{width:44px;height:62px;border-radius:4px;background:var(--soft);border:1px solid var(--line);object-fit:cover;flex:none}
+.item .who{flex:1;min-width:0}
+.item .who b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .who span{font-size:.83rem;color:var(--muted)}
+.flags{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.flag{font-size:.74rem;padding:1px 8px;border-radius:99px;background:var(--warn-soft);color:var(--warn)}
+.score{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.score small{font-size:.8rem;color:var(--muted);font-weight:400}
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:.93rem}
+
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:14px;background:var(--paper);margin:12px 0;overflow:hidden}
+.stat{padding:14px 10px;text-align:center;border-inline-start:1px solid var(--line)}
+.stat:first-child{border-inline-start:0}
+.stat b{display:block;font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:.8rem;color:var(--muted)}
+@media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.stat:nth-child(4){border-inline-start:0}.stat:nth-child(n+4){border-top:1px solid var(--line)}}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem;white-space:nowrap}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:start}
+th{font-weight:500;color:var(--muted);font-size:.8rem}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--soft)}
+td.num{font-variant-numeric:tabular-nums}
+.bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 16px}
+.bar{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.bar .n{width:30px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar .track{flex:1;height:10px;background:var(--soft);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar .fill{height:100%;border-radius:99px}
+.bar .p{width:40px;text-align:end;font-variant-numeric:tabular-nums}
+
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,14,20,.55);display:flex;align-items:flex-end;justify-content:center}
+.modal[hidden]{display:none}
+.panel{background:var(--paper);width:100%;max-width:880px;max-height:94%;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.modal{align-items:center}.panel{border-radius:18px;max-height:90%}}
+.phead{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-16px;background:var(--paper);padding:6px 0 10px;z-index:1}
+.phead h3{margin:0;font-size:1.05rem}
+.rv{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:18px;align-items:start}
+@media (max-width:700px){.rv{grid-template-columns:1fr}}
+.rv canvas{width:100%;border-radius:6px;border:1px solid var(--line);background:#fff}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin:8px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:4px;vertical-align:middle}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+select{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:9px 11px;font-size:1rem;color:var(--ink)}
+@media (max-width:420px){.step{font-size:.74rem}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);border-radius:99px;padding:5px 6px 5px 12px;font-size:.9rem;direction:ltr}
+.chip button{border:0;background:transparent;color:var(--muted);width:22px;height:22px;border-radius:50%;padding:0;line-height:1}
+.chip button:hover{background:var(--bad-soft);color:var(--bad)}
+.addsub{display:flex;gap:6px;flex:1 1 220px}
+.addsub input{flex:1}
+.stulist{margin-top:14px;border-top:1px solid var(--line)}
+.stu{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.stu .code{font-weight:700;font-variant-numeric:tabular-nums;min-width:52px;color:var(--mark);letter-spacing:.04em}
+.stu input{flex:1;background:transparent;border-color:transparent;padding:6px 8px}
+.stu input:focus{background:var(--soft);border-color:var(--line)}
+.stu .x{border:0;background:transparent;color:var(--muted);padding:6px 10px;border-radius:8px;font-size:.82rem;white-space:nowrap}
+.stu .x[data-armed]{color:var(--bad);background:var(--bad-soft)}
+.examnow{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.examnow label{flex:1 1 240px}
+.badge{display:inline-block;background:var(--mark-soft);color:var(--mark);border-radius:99px;padding:2px 10px;font-size:.8rem;font-weight:500}
+.newexam{border:1px dashed var(--mark);border-radius:12px;padding:14px;margin-top:14px;background:var(--soft)}
+.absent{display:flex;flex-wrap:wrap;gap:6px}
+.absent span{background:var(--soft);border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:.85rem}
+.gate{text-align:center;padding:30px 16px}
+.autonext{display:flex;align-items:center;gap:10px;font-size:.86rem;color:var(--muted);margin:-2px 2px 8px}
+.autonext .sw{cursor:pointer}
+.nextbar{display:flex;justify-content:flex-end;margin:14px 0 4px}
+.nextbar .btn{padding:12px 18px}
+.nextbar .arr::before{content:"←"}
+:root[dir="ltr"] .nextbar .arr::before{content:"→"}
+.autoflash{animation:af 1.2s ease}
+@keyframes af{0%{box-shadow:0 0 0 0 var(--mark)}100%{box-shadow:0 0 0 12px transparent}}
+@media (prefers-reduced-motion:reduce){.autoflash{animation:none}}
+.stages{display:flex;flex-direction:column;gap:10px}
+.stg{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--soft)}
+.stg.off{opacity:.62}
+.stg .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.stg .hd b{font-size:1rem}
+.stg .hd small{color:var(--muted);font-weight:400;margin-inline-start:6px}
+.sw{position:relative;width:46px;height:26px;border-radius:99px;border:0;background:var(--line);padding:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:inset-inline-start .15s}
+.sw[aria-checked="true"]{background:var(--mark)}.sw[aria-checked="true"]::after{inset-inline-start:23px}
+.stg .chip{background:var(--paper)}
+.stg{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
+.stg .hd{margin:0}
+.tg{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:6px 8px 6px 14px;font-size:.9rem;font-weight:500;color:var(--muted);flex:none}
+.tg[aria-pressed="true"]{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.imp{margin-top:12px;border-radius:10px;padding:10px 12px;background:var(--ok-soft);color:var(--ok);font-size:.9rem}
+.imp.bad{background:var(--bad-soft);color:var(--bad)}
+.imp ul{margin:4px 0 0;padding-inline-start:18px}
+.tchips{display:flex;gap:8px;flex-wrap:wrap}
+.tchip{border:1px solid var(--line);background:var(--soft);border-radius:99px;padding:6px 14px;font-size:.92rem}
+.tchip[aria-pressed="true"]{background:var(--mark);border-color:var(--mark);color:#fff}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px 14px;text-align:center;background:var(--soft);display:flex;flex-direction:column;align-items:center;gap:8px;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--mark);background:var(--mark-soft)}
+.drop b{font-size:1.02rem}.drop span.h{color:var(--muted);font-size:.87rem}
+.qbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px}
+.qbar span{font-size:.85rem;border-radius:99px;padding:3px 12px;background:var(--soft);border:1px solid var(--line)}
+.qbar .ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.qbar .bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.qbar .wait{background:var(--mark-soft);color:var(--mark);border-color:transparent}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.qt{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--paper);padding:0;text-align:center;font-size:.76rem}
+.qt img{display:block;width:100%;height:96px;object-fit:cover;background:var(--soft)}
+.qt .st{display:block;padding:4px 4px 5px;line-height:1.35;min-height:2.6em}
+.qt.ok{border-color:var(--ok)}.qt.ok .st{background:var(--ok-soft);color:var(--ok)}
+.qt.err{border-color:var(--bad)}.qt.err .st{background:var(--bad-soft);color:var(--bad)}
+.qt.run .st{background:var(--mark-soft);color:var(--mark)}
+.qt.dup .st{background:var(--warn-soft);color:var(--warn)}
+.gate p{color:var(--muted);margin:0 0 14px}
+</style></head><body>
+<div class="wrap">
+  <header class="top">
+    <svg class="logo" width="42" height="42" viewBox="0 0 42 42" aria-hidden="true">
+      <rect x="1" y="1" width="40" height="40" rx="10" fill="var(--paper)" stroke="var(--line)"/>
+      <circle cx="12" cy="15" r="4.2" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+      <circle cx="21" cy="15" r="4.2" fill="var(--mark)"/>
+      <circle cx="30" cy="15" r="4.2" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+      <circle cx="12" cy="27" r="4.2" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+      <circle cx="21" cy="27" r="4.2" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+      <circle cx="30" cy="27" r="4.2" fill="var(--mark)"/>
+    </svg>
+    <div style="flex:1"><h1><span data-en="Bubble Sheet Grader">مصحّح أوراق الإجابة</span></h1><p id="examLabel"></p></div><button class="btn" id="btnLang" aria-label="Language">English</button><button class="btn primary" id="btnInstall" hidden><span data-en="Install">تثبيت</span></button>
+  </header>
+
+  <nav class="steps" role="tablist">
+    <button class="step" role="tab" data-tab="students" aria-selected="false"><span class="dot"><span data-en="1">١</span></span><span><span data-en="Students">الطلاب</span></span></button>
+    <button class="step" role="tab" data-tab="exam" aria-selected="false"><span class="dot"><span data-en="2">٢</span></span><span><span data-en="Exam">الامتحان</span></span></button>
+    <button class="step" role="tab" data-tab="scan" aria-selected="false"><span class="dot"><span data-en="3">٣</span></span><span><span data-en="Grading">التصحيح</span></span></button>
+    <button class="step" role="tab" data-tab="results" aria-selected="false"><span class="dot"><span data-en="4">٤</span></span><span><span data-en="Results">النتائج</span></span></button>
+  </nav>
+  <div class="autonext"><button class="sw" role="switch" id="autoNext" aria-checked="true" aria-labelledby="autoNextLbl"></button><span id="autoNextLbl"><span data-en="Go to the next step automatically when a page is complete">الانتقال تلقائياً إلى الخطوة التالية عند إكمال الصفحة</span></span></div>
+
+  <!-- STUDENTS -->
+  <section id="tab-students" hidden>
+    <div class="card">
+      <div class="keyhead"><div><h2><span data-en="Stages">المراحل</span></h2></div>
+        <div class="row"><button class="btn" id="stAllOn"><span data-en="Enable all">تفعيل الكل</span></button><button class="btn" id="stAllOff"><span data-en="Disable all">إيقاف الكل</span></button></div></div>
+      <p class="sub"><span data-en="Enable only the stages you teach. A disabled stage is hidden from the app; its students and exams are kept.">فعِّل المراحل التي تدرّسها فقط. لا تظهر المرحلة المعطَّلة في التطبيق، ويُحتفَظ بطلابها وامتحاناتها إن وُجدت.</span></p>
+      <div class="stages" id="stageSetup"></div>
+    </div>
+    <div class="card">
+      <h2><span data-en="Upload all stages and students at once">رفع جميع المراحل وطلابها دفعةً واحدة</span></h2>
+      <p class="sub"><span data-en="One Excel file with each stage on its own sheet named after the stage (for example &quot;Stage 1&quot;), with a &quot;Student name&quot; column; or one sheet with a &quot;Stage&quot; column and a &quot;Student name&quot; column. Each student gets a code automatically, and stages that have students are enabled.">ملف Excel واحد تكون فيه كل مرحلة في ورقة (Sheet) تحمل اسمها، مثل «المرحلة الأولى»، وفيها عمود «اسم الطالب»، أو ورقة واحدة فيها عمود «المرحلة» وعمود «اسم الطالب». يُمنَح كل طالب رمزه تلقائياً، وتُفعَّل المراحل التي تضم طلاباً.</span></p>
+      <div class="row">
+        <span class="btn primary filebtn"><span data-en="Upload stages &amp; students file">رفع ملف المراحل والطلاب</span><input type="file" id="xlsAll" accept=".xlsx,.xls,.csv"></span>
+        <button class="btn ghost" id="btnTpl"><span data-en="Download blank Excel template">تنزيل نموذج Excel فارغ</span></button>
+      </div>
+      <div id="impRes"></div>
+    </div>
+    <p class="note info" id="noStage" hidden><span data-en="All stages are disabled. Enable a stage above, or upload a students file.">جميع المراحل معطَّلة. فعِّل المرحلة التي تريدها من الأعلى، أو ارفع ملف الطلاب.</span></p>
+    <div id="stuBox">
+    <div class="card">
+      <h2><span data-en="Students by stage">طلاب المرحلة</span></h2>
+      <p class="sub"><span data-en="Each student gets a fixed 4-digit code whose first digit is the stage. Students shade this code on the answer sheet.">يُمنَح كل طالب رمزاً ثابتاً من 4 أرقام، رقمه الأول هو رقم المرحلة، ويظلّله الطالب في ورقة الإجابة.</span></p>
+      <div class="seg" id="stageSeg"></div>
+    </div>
+    <div class="card">
+      <div class="keyhead">
+        <div><h2 id="stName2"></h2><div class="meter" id="stuCount"></div></div>
+        <button class="btn" id="btnCodes"><span data-en="Download codes (Excel)">تنزيل الرموز (Excel)</span></button>
+      </div>
+      <label class="f"><span data-en="Type or paste names, one per line">اكتب الأسماء أو الصقها، كل اسم في سطر</span><textarea id="namesInput" placeholder="علي حسن محمد&#10;زينب كاظم جواد&#10;مصطفى عباس علي" data-en-ph="Ali Hasan Mohammed&#10;Zainab Kadhim Jawad&#10;Mustafa Abbas Ali"></textarea></label>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="btnAddNames"><span data-en="Add to list">إضافة إلى القائمة</span></button>
+        <span class="btn filebtn"><span data-en="Import from Excel">استيراد من ملف Excel</span><input type="file" id="xlsIn" accept=".xlsx,.xls,.csv"></span>
+      </div>
+      <div class="stulist" id="stuList"></div>
+    </div>
+    </div>
+    <div class="nextbar"><button class="btn primary" data-next="exam"><span data-en="Next: Exam">التالي: الامتحان</span><span class="arr" aria-hidden="true"></span></button></div>
+  </section>
+
+  <!-- EXAM -->
+  <section id="tab-exam" hidden>
+    <div class="card">
+      <h2><span data-en="Current exam">الامتحان الحالي</span></h2>
+      <div class="examnow" id="examNow" style="margin-top:10px">
+        <label class="f"><span data-en="Choose exam">اختر الامتحان</span><select id="examSel"></select></label>
+        <button class="btn primary" id="btnNewExam"><span data-en="New exam">امتحان جديد</span></button>
+      </div>
+      <div class="newexam" id="newExam" hidden>
+        <div class="fields">
+          <div class="f full"><span><span data-en="Stage">المرحلة</span></span><div class="seg" id="neStage"></div></div>
+          <label class="f full"><span data-en="Subject">المادة</span><input type="text" id="neSub" list="neSubList" maxlength="50" dir="auto" placeholder="مثال: Orthodontics" data-en-ph="e.g. Orthodontics"><datalist id="neSubList"></datalist></label>
+          <label class="f full"><span data-en="Exam title (optional)">عنوان الامتحان (اختياري)</span><input type="text" id="neTitle" placeholder="مثال: الامتحان الشهري الأول" data-en-ph="e.g. First monthly exam" maxlength="60"></label>
+        </div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" id="neCreate"><span data-en="Create exam">إنشاء الامتحان</span></button><button class="btn ghost" id="neCancel"><span data-en="Cancel">إلغاء</span></button></div>
+      </div>
+    </div>
+
+    <div id="examBody">
+      <div class="card">
+        <h2><span data-en="Sheet settings">إعدادات الورقة</span></h2>
+        <p class="sub" id="exInfo"></p>
+        <div class="fields">
+          <label class="f full"><span data-en="Exam title">عنوان الامتحان</span><input type="text" id="cfTitle" maxlength="60"></label>
+          <label class="f"><span data-en="Number of questions (1–100)">عدد الأسئلة (من 1 إلى 100)</span><input type="number" id="cfNq" min="1" max="100" inputmode="numeric"></label>
+          <label class="f"><span data-en="Marks per question">درجة كل سؤال</span><input type="number" id="cfPts" min="0.25" step="0.25" inputmode="decimal"></label>
+          <div class="f"><span><span data-en="Number of options">عدد الخيارات</span></span><div class="seg" id="cfNo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></div></div>
+          <div class="f"><span><span data-en="Number of exam forms (versions)">عدد نماذج الامتحان</span></span><div class="seg" id="cfForms"><button data-v="1">1</button><button data-v="2">2 (A, B)</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+          <div class="f"><span><span data-en="Option letters">حروف الخيارات</span></span><div class="seg" id="cfLet"><button data-v="latin">A B C D</button><button data-v="arabic">أ ب ج د</button></div></div>
+        </div>
+        <div class="f" style="margin-top:14px"><span><span data-en="Teacher name on the sheet (optional; you can pick more than one)">اسم التدريسي على الورقة (اختياري، ويمكن اختيار أكثر من اسم)</span></span><div class="tchips" id="cfTeach"></div></div>
+        <p class="note" id="lockNote" hidden><span data-en="The sheet layout is locked because this exam already has graded sheets. You can still change the title, marks per question and the key.">شكل الورقة مقفل لوجود أوراق مصحَّحة في هذا الامتحان. يمكنك تغيير العنوان ودرجة السؤال والمفتاح.</span></p>
+      </div>
+
+      <div class="card">
+        <h2><span data-en="Sheet header &amp; logo">ترويسة الورقة والشعار</span></h2>
+        <p class="sub"><span data-en="Printed at the top of every sheet: logo in the centre, Arabic on the right, English on the left. Changes apply to all exams.">تُطبَع أعلى كل ورقة: الشعار في الوسط، والعربية يميناً، والإنكليزية يساراً. ويسري التغيير على جميع الامتحانات.</span></p>
+        <p class="note" id="v1Note" hidden></p>
+        <div class="fields">
+          <label class="f"><span data-en="Arabic header (one line per row)">الترويسة بالعربية (كل سطر على حدة)</span><textarea id="inAr" dir="rtl" rows="5" style="min-height:140px"></textarea></label>
+          <label class="f"><span data-en="English header">الترويسة بالإنكليزية</span><textarea id="inEn" rows="5" dir="ltr" style="min-height:118px"></textarea></label>
+          <label class="f"><span data-en="Teacher names (one per line)">أسماء التدريسيين (كل اسم في سطر)</span><textarea id="inTeacher" dir="auto" rows="3" style="min-height:90px" placeholder="م.م. إيلاف جمال حرب"></textarea></label>
+          <label class="f"><span data-en="Academic year">العام الدراسي</span><input type="text" id="inYear" maxlength="20" dir="ltr"></label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <span class="btn filebtn"><span data-en="Change logo">تغيير الشعار</span><input type="file" accept="image/*" id="logoFile"></span>
+          <button class="btn ghost" id="logoReset"><span data-en="Al-Turath University logo">شعار جامعة التراث</span></button>
+          <button class="btn ghost" id="logoNone"><span data-en="No logo">بلا شعار</span></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span data-en="Print answer sheets">طباعة أوراق الإجابة</span></h2>
+        <div class="preview">
+          <canvas id="sheetPreview" aria-label="معاينة ورقة الإجابة" data-en-aria="Answer sheet preview"></canvas>
+          <div class="side">
+            <p><span data-en="Each sheet is printed with the student&#x27;s name and code; the student only shades the code and the answers. Print on A4 at actual size (100%).">تُطبَع كل ورقة باسم الطالب ورمزه، ولا يظلّل الطالب إلا رمزه وإجاباته. اطبعها على ورق A4 بحجمها الفعلي (100%).</span></p>
+            <div class="row" style="flex-direction:column;align-items:stretch">
+              <button class="btn primary" id="btnPdfNames"><span data-en="Sheets with student names">أوراق بأسماء الطلاب</span></button>
+              <button class="btn" id="btnPdfBlank"><span data-en="Blank sheet (no name)">ورقة فارغة بلا اسم</span></button>
+            </div>
+            <p class="progress" id="pdfProgress" hidden></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="keyhead">
+          <div><h2><span data-en="Answer key">مفتاح الإجابة</span></h2><div class="meter" id="keyMeter"></div></div>
+          <div class="row">
+            <span class="btn filebtn"><span data-en="Read key from a shaded sheet">قراءة المفتاح من ورقة مظلَّلة</span><input type="file" accept="image/*" id="keyFile"></span>
+            <button class="btn ghost" id="btnClearKey"><span data-en="Clear key">مسح المفتاح</span></button>
+          </div>
+        </div>
+        <div class="progress" id="keyProgress" hidden></div>
+        <div class="f" id="kfBox" hidden style="margin-bottom:12px"><span><span data-en="Key for form">مفتاح النموذج</span></span><div class="seg" id="kfSeg"></div></div>
+        <div class="grid" id="keyGrid"></div>
+      </div>
+
+      <div class="nextbar"><button class="btn primary" data-next="scan"><span data-en="Next: Grading">التالي: التصحيح</span><span class="arr" aria-hidden="true"></span></button></div>
+      <div class="card">
+        <h2><span data-en="Delete this exam">حذف هذا الامتحان</span></h2>
+        <p class="sub"><span data-en="Deletes this exam&#x27;s key and graded sheets only. Students and codes are kept.">يحذف المفتاح والأوراق المصحَّحة لهذا الامتحان فقط، ويُبقي على الطلاب ورموزهم.</span></p>
+        <button class="btn danger" id="btnDelExam"><span data-en="Delete exam">حذف الامتحان</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCAN -->
+  <section id="tab-scan" hidden>
+    <p class="note" id="keyWarn" hidden></p>
+    <div class="card">
+      <h2><span data-en="Grade student sheets">تصحيح أوراق الطلاب</span></h2>
+      <p class="sub" id="scanFor"></p>
+      <label class="f" style="max-width:260px;margin-bottom:12px"><span data-en="Grading date">تاريخ التصحيح</span><input type="date" id="gDate"></label>
+      <div class="drop" id="drop">
+        <b><span data-en="Upload the sheet photos you took">ارفع صور الأوراق التي صوّرتها</span></b>
+        <span class="h"><span data-en="Select all the photos at once from your gallery or files, or drag them here">اختر جميع الصور دفعةً واحدة من المعرض أو الملفات، أو اسحبها إلى هنا</span></span>
+        <span class="btn primary filebtn"><span data-en="Choose photos">اختيار الصور</span><input type="file" accept="image/*" multiple id="galFile"></span>
+        <span class="btn filebtn"><span data-en="Or take a photo now">أو صوّر ورقة الآن</span><input type="file" accept="image/*" capture="environment" id="camFile"></span>
+      </div>
+      <div id="queue" hidden>
+        <div class="qbar" id="qBar"></div>
+        <div class="qgrid" id="qGrid"></div>
+        <div class="row" style="margin-top:10px"><button class="btn ghost" id="qClear"><span data-en="Clear photo list">تفريغ قائمة الصور</span></button></div>
+      </div>
+      <ul class="tips">
+        <li><span data-en="Place the sheet on a light, flat surface and photograph it straight from above.">ضع الورقة على سطح فاتح ومستوٍ، وصوّرها من الأعلى مباشرة.</span></li>
+        <li><span data-en="All four black corner squares must be fully visible.">يجب أن تظهر المربعات السوداء الأربعة كاملةً في الصورة.</span></li>
+        <li><span data-en="Avoid strong shadows and glare on the paper.">تجنّب الظلال القوية والإضاءة المنعكسة على الورقة.</span></li>
+      </ul>
+      <div class="progress" id="scanProgress" hidden></div>
+    </div>
+    <div class="card">
+      <div class="keyhead"><h2 id="scanCount"><span data-en="Graded sheets">الأوراق المصحَّحة</span></h2><button class="btn primary" id="btnBoth2"><span data-en="Download colored PDF + Excel">تنزيل الأوراق الملوّنة PDF + Excel</span></button></div>
+      <p class="progress" id="bothProgress2" hidden></p>
+      <div class="list" id="scanList"></div>
+    </div>
+    <div class="nextbar"><button class="btn primary" data-next="results"><span data-en="Next: Results">التالي: النتائج</span><span class="arr" aria-hidden="true"></span></button></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="tab-results" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <div class="keyhead">
+        <div><h2><span data-en="Grades">الدرجات</span></h2><div class="meter"><span data-en="Tap any student to review their sheet.">اضغط على أي طالب لمراجعة ورقته.</span></div></div>
+        <div class="row"><button class="btn primary" id="btnBoth"><span data-en="Download colored PDF + Excel">تنزيل الأوراق الملوّنة PDF + Excel</span></button><button class="btn" id="btnXlsx"><span data-en="Excel only">Excel فقط</span></button></div>
+      </div>
+      <p class="progress" id="bothProgress" hidden></p>
+      <div class="tablewrap"><table><thead><tr><th>#</th><th><span data-en="Code">الرمز</span></th><th><span data-en="Name">الاسم</span></th><th><span data-en="Correct">صحيح</span></th><th><span data-en="Wrong">خطأ</span></th><th><span data-en="Blank">متروك</span></th><th><span data-en="Score">الدرجة</span></th><th>%</th><th><span data-en="Grading date">تاريخ التصحيح</span></th></tr></thead><tbody id="resBody"></tbody></table></div>
+      <div class="empty" id="resEmpty" hidden><span data-en="No sheets have been graded for this exam yet.">لم تُصحَّح أي ورقة في هذا الامتحان بعد.</span></div>
+    </div>
+    <div class="card" id="absCard" hidden>
+      <h2><span data-en="Not graded">لم تُصحَّح أوراقهم</span></h2>
+      <p class="sub"><span data-en="Students of this stage with no sheet found for their code.">طلاب المرحلة الذين لم يُعثَر على ورقة تحمل رمزهم.</span></p>
+      <div class="absent" id="absList"></div>
+    </div>
+    <div class="card">
+      <h2><span data-en="Question analysis">تحليل الأسئلة</span></h2>
+      <p class="sub"><span data-en="Share of students who answered each question correctly. Red questions are hard, or their key may be wrong.">نسبة الطلاب الذين أجابوا عن كل سؤال إجابةً صحيحة. الأسئلة الحمراء صعبة، أو قد يكون مفتاحها خاطئاً.</span></p>
+      <div class="bars" id="bars"></div>
+    </div>
+    <p style="color:var(--muted);font-size:.85rem;text-align:center"><span data-en="The PDF has every student&#x27;s sheet graded in color (green correct, red wrong, green ring = right answer) with the score. The Excel file has the grades, grading dates, question analysis, absentees and a sheet per student.">ملف PDF يضم ورقة كل طالب مصحَّحة بالألوان (الأخضر صحيح، والأحمر خطأ، والدائرة الخضراء هي الإجابة الصحيحة) مع درجته، وملف Excel يضم الدرجات وتاريخ التصحيح وتحليل الأسئلة والغائبين وورقة لكل طالب بإجاباته.</span></p>
+  </section>
+
+  <div class="card gate" id="gate" hidden>
+    <p><span data-en="No exam yet. Create one and choose its stage and subject.">لا يوجد امتحان بعد. أنشئ امتحاناً وحدّد مرحلته ومادته.</span></p>
+    <button class="btn primary" id="gateBtn"><span data-en="Create exam">إنشاء امتحان</span></button>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="rvTitle">
+    <div class="phead"><h3 id="rvTitle"><span data-en="Review sheet">مراجعة الورقة</span></h3><button class="btn" id="rvClose"><span data-en="Done">تم</span></button></div>
+    <div class="rv">
+      <div>
+        <canvas id="rvCanvas"></canvas>
+        <p class="meter" id="rvNoImg" hidden><span data-en="This sheet&#x27;s photo isn&#x27;t saved, but its answers are and you can edit them. The colored PDF is drawn from the answers.">صورة هذه الورقة غير محفوظة، لكن الإجابات محفوظة ويمكنك تعديلها. ويُرسَم ملف PDF الملوّن من الإجابات.</span></p>
+        <div class="legend"><span><i style="background:var(--ok)"></i><span data-en="Correct">صحيح</span></span><span><i style="background:var(--bad)"></i><span data-en="Wrong">خطأ</span></span><span><i style="border:2px solid var(--ok);background:transparent"></i><span data-en="Right answer">الإجابة الصحيحة</span></span><span><i style="background:var(--warn)"></i><span data-en="Multiple marks">أكثر من خيار</span></span></div>
+      </div>
+      <div>
+        <div class="fields">
+          <label class="f"><span data-en="Code">الرمز</span><input type="text" id="rvId" inputmode="numeric" maxlength="4"></label>
+          <div class="f"><span><span data-en="Name">الاسم</span></span><b id="rvName" style="color:var(--ink);padding:9px 0"></b></div>
+          <label class="f"><span data-en="Grading date">تاريخ التصحيح</span><input type="date" id="rvDate"></label>
+          <div class="f full" id="rvFormBox" hidden><span><span data-en="Exam form">نموذج الامتحان</span></span><div class="seg" id="rvForm"></div></div>
+        </div>
+        <p class="score" id="rvScore" style="margin:14px 0 6px"></p>
+        <p class="meter" style="margin:0 0 10px"><span data-en="If a bubble was misread, tap the correct letter. Tap it again to leave the question blank.">إذا قرأ التطبيق دائرةً خطأً فاضغط على الحرف الصحيح، واضغط عليه مرة أخرى لتركه دون إجابة.</span></p>
+        <div class="grid" id="rvGrid"></div>
+        <div class="row" style="margin-top:16px"><button class="btn primary" id="rvPdf"><span data-en="Download this colored sheet (PDF)">تنزيل ورقته الملوّنة PDF</span></button><button class="btn danger" id="rvDelete"><span data-en="Delete sheet">حذف الورقة</span></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="guard" id="guard" hidden role="alertdialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbox"><h3 id="gTitle"></h3><p id="gMsg"></p><div class="row" id="gBtns"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+/* ---------- language: Fusha Arabic (default) or English ---------- */
+let LANG=(()=>{try{return localStorage.getItem('omr-lang')==='en'?'en':'ar';}catch(e){return'ar';}})();
+const TR=(a,e)=>LANG==='en'?e:a;
+const SN_AR={'1':'المرحلة الأولى','2':'المرحلة الثانية','3':'المرحلة الثالثة','4':'المرحلة الرابعة'},SN_EN={'1':'Stage 1','2':'Stage 2','3':'Stage 3','4':'Stage 4'};
+const SS_AR={'1':'الأولى','2':'الثانية','3':'الثالثة','4':'الرابعة'},SS_EN={'1':'1st','2':'2nd','3':'3rd','4':'4th'};
+const SN=k=>TR(SN_AR[k]||'',SN_EN[k]||''),SS=k=>TR(SS_AR[k]||'',SS_EN[k]||'');
+function applyLang(){const en=LANG==='en',R=document.documentElement;R.lang=en?'en':'ar';R.dir=en?'ltr':'rtl';
+  document.querySelectorAll('[data-en]').forEach(el=>{if(el.dataset.ar==null)el.dataset.ar=el.innerHTML;el.innerHTML=en?el.dataset.en:el.dataset.ar;});
+  document.querySelectorAll('[data-en-ph]').forEach(el=>{if(el.dataset.arPh==null)el.dataset.arPh=el.getAttribute('placeholder')||'';el.setAttribute('placeholder',en?el.dataset.enPh:el.dataset.arPh);});
+  document.querySelectorAll('[data-en-aria]').forEach(el=>{if(el.dataset.arAria==null)el.dataset.arAria=el.getAttribute('aria-label')||'';el.setAttribute('aria-label',en?el.dataset.enAria:el.dataset.arAria);});
+  const b=document.getElementById('btnLang');if(b){b.textContent=en?'العربية':'English';b.setAttribute('aria-label',en?'التبديل إلى العربية':'Switch to English');}
+  document.title=en?'Bubble Sheet Grader':'مصحّح أوراق الإجابة';}
+applyLang();
+const FONT='"Readex Pro","Segoe UI",Tahoma,sans-serif';
+const LET={latin:['A','B','C','D','E'],arabic:['أ','ب','ج','د','هـ']};
+const LS='omr-grader-v2';
+
+/* ---------- state ---------- */
+const STAGE_NAMES={'1':'المرحلة الأولى','2':'المرحلة الثانية','3':'المرحلة الثالثة','4':'المرحلة الرابعة'};
+const DEF_STAGES=()=>[
+  {k:'1',name:'المرحلة الأولى',subjects:[],students:[],off:true},
+  {k:'2',name:'المرحلة الثانية',subjects:[],students:[],off:true},
+  {k:'3',name:'المرحلة الثالثة',subjects:[],students:[],off:true},
+  {k:'4',name:'المرحلة الرابعة',subjects:[],students:[],off:true}];
+let S={stages:DEF_STAGES(),exams:[],cur:null,viewStage:'2',inst:null};
+const IMG={};
+try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&s.stages)S=Object.assign(S,s);
+  else{const o=JSON.parse(localStorage.getItem('omr-grader-v1')||'null');
+    if(o&&o.cfg&&o.results&&o.results.length){const c=o.cfg;
+      S.exams.push({id:'m'+Date.now().toString(36),stage:'2',subject:'Crown and Bridge',title:c.title||'',nq:c.nq,no:c.no,pts:c.pts,letters:c.letters,idd:c.idd,key:o.key||[],results:o.results,created:Date.now()});
+      S.cur=S.exams[0].id;}}}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+// make sure all four stages exist (older saves had only 2-4), ordered 1..4
+['1','2','3','4'].forEach(k=>{if(!S.stages.find(s=>s.k===k))S.stages.push({k,name:STAGE_NAMES[k],subjects:[],students:[],off:true});});
+S.stages.sort((a,b)=>a.k.localeCompare(b.k));
+S.stages.forEach(st=>st.subjects=[]);  // subjects are no longer preset per stage; typed per exam
+const activeStages=()=>S.stages.filter(s=>!s.off);
+const E=()=>S.exams.find(x=>x.id===S.cur)||null;
+const stageOf=k=>S.stages.find(s=>s.k===k);
+const FORM_L=['A','B','C','D'];
+function fixKey(ex){ex.forms=Math.min(4,Math.max(1,ex.forms|0||1));if(!Array.isArray(ex.keys))ex.keys=[ex.key||[]];
+  const fix=k=>Array.from({length:ex.nq},(_,i)=>(k&&k[i]!=null&&k[i]<ex.no)?k[i]:-1);
+  ex.keys=Array.from({length:ex.forms},(_,f)=>fix(ex.keys[f]));ex.key=ex.keys[0];}
+const KEY=(ex,r)=>ex.keys[(r&&r.form>=0&&r.form<ex.forms)?r.form:0]||ex.keys[0];
+const formTxt=(ex,r)=>ex.forms>1?(r&&r.form>=0&&r.form<ex.forms?FORM_L[r.form]:'?'):'';
+let KF=0;
+S.exams.forEach(fixKey);
+function allStudents(){const m={};S.stages.forEach(s=>s.students.forEach(st=>m[st.c]={...st,stage:s.k}));return m;}
+function nextCode(st){let mx=0;st.students.forEach(x=>{const n=parseInt(x.c.slice(1),10);if(n>mx)mx=n;});return mx+1>999?null:st.k+String(mx+1).padStart(3,'0');}
+const examLabel=ex=>ex?[SN(ex.stage),ex.subject,ex.title].filter(Boolean).join(TR('، ',', ')):'';
+
+/* ---------- sheet geometry (mm, A4) ---------- */
+const MK=[[8,8],[193,8],[193,280],[8,280]];
+const MKS=9;
+const MKC=MK.map(([x,y])=>[x+MKS/2,y+MKS/2]);
+const ORI={x:20,y:8,s:5};
+const V2=ex=>!!ex&&ex.ver>=2;
+const PAP=ex=>V2(ex)?[60,10.5]:[105,16];      // blank paper sample used for orientation
+const SB={x:56,y:86,w:36,h:12};                 // score box (new design)
+const STRIP={x:22,y:268,w:166,h:13.5};          // result strip on graded PDF
+function layout(cfg){
+  const v2=cfg.ver>=2,rtl=cfg.letters==='arabic';const q=[];
+  let r=2.35,nfs=3,bfs=2.3,tk=7.2;
+  let fit=null;
+  if(cfg.ver>=3&&cfg.nq>0){ // spread the questions over the whole answer area
+    const X0=20,AW=170,Y0=113,AH=149;
+    for(let c=1;c<=4;c++){const rows=Math.ceil(cfg.nq/c),colW=AW/c,rowH=Math.min(14,AH/rows),sp=Math.min(13,(colW-12)/cfg.no);
+      if(rowH<5.6||sp<6.2)continue;const rr=Math.max(2.35,Math.min(3.6,Math.min(rowH,sp)*0.36));
+      if(!fit||rr>fit.r+0.01)fit={c,rows,colW,rowH,sp,r:rr};}
+    if(fit){r=fit.r;nfs=Math.min(4,r*1.28);bfs=r*0.98;const numW=nfs*1.9+2,contentW=numW+(cfg.no-1)*fit.sp+2*r;tk=numW-0.2;
+      const per=Math.ceil(cfg.nq/fit.c),y1=Y0+(AH-fit.rows*fit.rowH)/2+fit.rowH/2;
+      for(let i=0;i<cfg.nq;i++){const c=Math.floor(i/per),rw=i%per,left=X0+c*fit.colW+(fit.colW-contentW-4)/2+4,y=y1+rw*fit.rowH;
+        let numX=left+numW-2.2;const bs=[];for(let k=0;k<cfg.no;k++)bs.push([left+numW+r+k*fit.sp,y]);
+        if(rtl){numX=210-numX;bs.forEach(b=>b[0]=210-b[0]);}q.push({numX,y,bs});}
+      fit.y1=y1;fit.X0=X0;}}
+  if(!fit){
+  const per=25,cols=Math.max(1,Math.ceil(cfg.nq/per)),colW=170/cols,sp=6.6,top=v2?113:116,rowH=6.2;
+  const contentW=10+(cfg.no-1)*sp+r*2;
+  for(let i=0;i<cfg.nq;i++){const c=Math.floor(i/per),rr=i%per,left=20+c*colW+(colW-contentW)/2,y=top+rr*rowH;
+    let numX=left+7.5;const bs=[];for(let k=0;k<cfg.no;k++)bs.push([left+10+r+k*sp,y]);
+    if(rtl){numX=210-numX;bs.forEach(b=>b[0]=210-b[0]);}q.push({numX,y,bs});}}
+  const id=[];let idr=r,idR=0;
+  if(v2){idr=1.65;for(let j=0;j<cfg.idd;j++){const col=[];for(let d=0;d<10;d++)col.push([25.5+j*6.2,59.5+d*4.1]);id.push(col);}
+    idR=cfg.idd?Math.max(25.5+(cfg.idd-1)*6.2+idr+3.4,49.5):0;}
+  else{for(let j=0;j<cfg.idd;j++){const col=[];for(let d=0;d<10;d++)col.push([26+j*7.2,45+d*5.5]);id.push(col);}
+    idR=cfg.idd?Math.max(26+(cfg.idd-1)*7.2+6,58):0;}
+  return{q,id,r,idr,rtl,idR,v2,nfs,bfs,tk,grid:fit};
+}
+function pen(c,s,ox,oy){const M=v=>v*s;
+  return{M,T:(t,x,y,sz,wt,al,col,dir)=>{c.direction=dir||'rtl';c.font=`${wt} ${M(sz)}px ${FONT}`;c.textAlign=al;c.fillStyle=col||'#000';c.fillText(t,M(x-ox),M(y-oy));},
+    W:(t,sz,wt)=>{c.font=`${wt} ${M(sz)}px ${FONT}`;return c.measureText(t).width/s;},
+    line:(x0,y0,x1,y1,wd)=>{c.strokeStyle='#000';c.lineWidth=M(wd||0.25);c.beginPath();c.moveTo(M(x0-ox),M(y0-oy));c.lineTo(M(x1-ox),M(y1-oy));c.stroke();}};}
+const FB=(ex)=>Array.from({length:(V2(ex)&&ex.forms>1)?ex.forms:0},(_,f)=>[74-(((V2(ex)&&ex.forms>1)?ex.forms:1)-1)*4+f*8,55.5]);const FBR=2.1;
+const PZ1={x:20,y:30,w:170,h:38},PZ2={x:20,y:44.5,w:170,h:15.5}; // personal overlay zone
+const PZ=ex=>V2(ex)?PZ2:PZ1;
+
+/* ---------- header / logo ---------- */
+const DEF_INST=()=>({
+  ar:['جمهورية العراق','وزارة التعليم العالي والبحث العلمي','جامعة التراث','الكلية التقنية الصحية والطبية','قسم تقنيات صناعة الأسنان'],
+  en:['Republic of Iraq','Ministry of Higher Education & Scientific Research','Al-Turath University','College of Health & Medical Technology','Dept. of Dental Industry Techniques'],
+  teachers:[],year:'2026 - 2027',logo:''});
+S.inst=Object.assign(DEF_INST(),S.inst||{});
+if(S.inst.teacher!=null){S.inst.teachers=S.inst.teacher?[S.inst.teacher]:[];delete S.inst.teacher;}
+const exTeachers=ex=>(ex&&Array.isArray(ex.teachers))?ex.teachers:(S.inst.teachers||[]).slice(0,1);
+const INST=()=>S.inst;
+const LOGO={im:null,ok:false,w:1,h:1};
+function loadLogo(){LOGO.ok=false;const src=S.inst.logo==='none'?'':(S.inst.logo||window.TURATH_LOGO||'');if(!src){redrawSoon();return;}
+  const im=new Image();im.onload=()=>{if(LOGO.im!==im)return;LOGO.ok=true;LOGO.w=im.naturalWidth;LOGO.h=im.naturalHeight;redrawSoon();};LOGO.im=im;im.src=src;}
+function redrawSoon(){if(typeof TAB!=='undefined'&&TAB==='exam'&&E())setTimeout(drawPreview,0);}
+
+/* mode: 'generic' | 'full' | 'base' */
+function drawSheet(cv,s,ex,mode,stu){
+  if(!V2(ex))return drawSheetV1(cv,s,ex,mode,stu);
+  cv.width=Math.round(210*s);cv.height=Math.round(297*s);
+  const c=cv.getContext('2d'),L=layout(ex),LT=LET[ex.letters],{M,T,W,line}=pen(c,s,0,0),I=INST();
+  c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.fillStyle='#000';
+  MK.forEach(([x,y])=>c.fillRect(M(x),M(y),M(MKS),M(MKS)));c.fillRect(M(ORI.x),M(ORI.y),M(ORI.s),M(ORI.s));
+  const bub=(x,y,lab,rad,fs)=>{c.beginPath();c.arc(M(x),M(y),M(rad),0,Math.PI*2);c.lineWidth=M(0.26);c.strokeStyle='#000';c.stroke();
+    c.textBaseline='middle';T(lab,x,y+0.12,fs,400,'center','#8a8a8a','ltr');c.textBaseline='alphabetic';};
+  c.textBaseline='alphabetic';
+  // header: Arabic right, logo centre, English left
+  const hl=(arr,n)=>(arr||[]).slice(0,n);
+  hl(I.ar,5).forEach((t,i)=>{const big=i===2;T(t,188,16.5+i*5,big?3.7:3.05,big?700:500,'right');});
+  hl(I.en,5).forEach((t,i)=>{const big=i===2;let sz=big?3.0:2.5;const mw=(LOGO.ok?83:100)-22;while(sz>1.8&&W(t,sz,big?700:400)>mw)sz-=0.1;T(t,22,16.5+i*5,sz,big?700:400,'left','#000','ltr');});
+  if(LOGO.ok){const ar=LOGO.w/LOGO.h;let h=25,w=h*ar;if(w>44){w=44;h=w/ar;}try{c.drawImage(LOGO.im,M(105-w/2),M(26-h/2),M(w),M(h));}catch(e){}}
+  line(20,41.5,190,41.5,0.45);
+  // code box (smaller)
+  c.lineWidth=M(0.3);c.strokeStyle='#000';c.strokeRect(M(20),M(44),M(L.idR-20),M(55));
+  T('الرمز',(20+L.idR)/2,48.3,2.9,600,'center');
+  L.id.forEach(col=>{const x=col[0][0];c.lineWidth=M(0.22);c.strokeRect(M(x-2.6),M(50),M(5.2),M(5.8));col.forEach(([bx,by],d)=>bub(bx,by,String(d),L.idr,1.9));});
+  // information fields
+  const XL=L.idR+6;
+  const field=(t,y,x0,x1,val)=>{T(t+':',x0,y,3.4,600,'right');const tw=W(t+':',3.4,600);
+    if(val)T(val,x0-tw-2,y,3.4,400,'right');else line(x0-tw-2,y+0.8,x1,y+0.8,0.22);};
+  const fb=FB(ex);
+  if(fb.length){c.lineWidth=M(0.3);c.strokeStyle='#000';c.strokeRect(M(56),M(44),M(36),M(16));T('النموذج',74,48.3,2.9,600,'center');
+    fb.forEach(([x,y],f)=>bub(x,y,FORM_L[f],FBR,2.3));}
+  if(mode==='generic'){field('الاسم',50,188,fb.length?96:XL);field('الرمز',58,188,120);}
+  const stn=(stageOf(ex.stage)?.name||'').replace('المرحلة ','');
+  field('المادة',66,188,124,ex.subject||'');field('المرحلة',66,120,XL,stn);
+  field('الامتحان',74,188,XL,ex.title||'');
+  field('العام الدراسي',82,188,124,I.year||'');field('التاريخ',82,120,XL);
+  {const ts=exTeachers(ex),tn=ts.join('، '),lab=ts.length>1?'التدريسيون':'التدريسي',x1=SB.x+SB.w+4;
+   if(tn){const lw=W(lab+':',3.4,600),room=188-lw-2-x1;let sz=3.4;while(sz>2.4&&W(tn,sz,400)>room)sz-=0.1;T(lab+':',188,90,3.4,600,'right');T(tn,188-lw-2,90,sz,400,'right');}
+   else field(lab,90,188,x1);
+   field('توقيع التدريسي',97.5,188,x1);}
+  c.lineWidth=M(0.35);c.strokeRect(M(SB.x),M(SB.y),M(SB.w),M(SB.h));
+  T('الدرجة',SB.x+SB.w-1.5,SB.y+3.6,2.6,600,'right');
+  T('من '+(+(ex.nq*ex.pts).toFixed(2)),SB.x+1.5,SB.y+SB.h-1.6,2.4,400,'left','#555');
+  if(mode==='full'&&stu)drawPersonal(c,s,stu,0,0,ex);
+  T(FB(ex).length?'ظلّل رمزك ونموذج الأسئلة، ثم دائرة واحدة فقط لكل سؤال بقلم غامق، وامسح أي خطأ جيداً.':'ظلّل رمزك في المربع الجانبي، ثم دائرة واحدة فقط لكل سؤال بقلم غامق، وامسح أي خطأ جيداً.',188,103,2.9,400,'right');
+  line(20,106.5,190,106.5);
+  if(L.grid){const G=L.grid,yT=G.y1-G.rowH/2-2,yB=G.y1+(G.rows-0.5)*G.rowH+2;
+    c.fillStyle='#F3F5F8';for(let rw=1;rw<G.rows;rw+=2)c.fillRect(M(20.4),M(G.y1+rw*G.rowH-G.rowH/2),M(169.2),M(G.rowH));
+    c.lineWidth=M(0.3);c.strokeStyle='#8a8f98';c.strokeRect(M(20),M(yT),M(170),M(yB-yT));
+    c.lineWidth=M(0.2);for(let k=1;k<G.c;k++){const x=G.X0+k*G.colW;c.beginPath();c.moveTo(M(x),M(yT));c.lineTo(M(x),M(yB));c.stroke();}
+    c.fillStyle='#000';}
+  L.q.forEach((q,i)=>{c.textBaseline='middle';T(String(i+1),q.numX,q.y+0.2,L.nfs,700,L.rtl?'left':'right','#000','ltr');c.textBaseline='alphabetic';q.bs.forEach(([x,y],k)=>bub(x,y,LT[k],L.r,L.bfs));});
+  T('لا تطوِ الورقة ولا تكتب قرب المربعات السوداء',105,287,2.8,400,'center','#555');
+}
+function drawPersonal(c,s,stu,ox,oy,ex){
+  if(!V2(ex))return drawPersonalV1(c,s,stu,ox,oy);
+  const{T,W}=pen(c,s,ox,oy);c.textBaseline='alphabetic';
+  T('الاسم: '+stu.n,188,50,4,600,'right');
+  T('الرمز: '+stu.c,188,58,4,700,'right');
+  const tw=W('الرمز: '+stu.c,4,700);c.direction='rtl';
+  T('ظلّله في المربع الجانبي',188-tw-4,58,2.8,400,'right','#666');
+  const L=layout({nq:0,no:4,letters:'latin',idd:4,ver:2});
+  stu.c.split('').forEach((d,j)=>{if(L.id[j]){c.textBaseline='middle';T(d,L.id[j][0][0],53,3.6,600,'center','#555','ltr');c.textBaseline='alphabetic';}});
+}
+function personalPNG(stu,s,ex){const Z=PZ(ex),cv=document.createElement('canvas');cv.width=Math.round(Z.w*s);cv.height=Math.round(Z.h*s);
+  drawPersonal(cv.getContext('2d'),s,stu,Z.x,Z.y,ex);return cv.toDataURL('image/png');}
+
+/* old design (exams made before the update keep it, so already-printed sheets still read correctly) */
+function drawSheetV1(cv,s,ex,mode,stu){
+  cv.width=Math.round(210*s);cv.height=Math.round(297*s);
+  const c=cv.getContext('2d'),L=layout(ex),LT=LET[ex.letters],{M,T,line}=pen(c,s,0,0);
+  c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.fillStyle='#000';
+  MK.forEach(([x,y])=>c.fillRect(M(x),M(y),M(MKS),M(MKS)));c.fillRect(M(ORI.x),M(ORI.y),M(ORI.s),M(ORI.s));
+  const bub=(x,y,lab)=>{c.beginPath();c.arc(M(x),M(y),M(L.r),0,Math.PI*2);c.lineWidth=M(0.28);c.strokeStyle='#000';c.stroke();
+    c.textBaseline='middle';T(lab,x,y+0.15,2.3,400,'center','#8a8a8a');c.textBaseline='alphabetic';};
+  c.textBaseline='alphabetic';
+  const lineL=L.idR+10;
+  T(ex.subject||'',188,27,6,700,'right');
+  T([stageOf(ex.stage)?.name,ex.title].filter(Boolean).join('، '),188,35.5,3.8,500,'right','#333');
+  const field=(t,y)=>{T(t+':',188,y,3.8,500,'right');c.font=`500 ${M(3.8)}px ${FONT}`;const tw=c.measureText(t+':').width/s;line(188-tw-2,y+0.8,lineL,y+0.8);return tw;};
+  if(mode==='generic'){field('الاسم',52);field('الكود',63);}
+  field('التاريخ',75);
+  c.lineWidth=M(0.3);c.strokeStyle='#000';c.strokeRect(M(20),M(24),M(L.idR-20),M(75));
+  T('الكود',(20+L.idR)/2,29.5,3.2,600,'center');
+  L.id.forEach(col=>{const x=col[0][0];c.lineWidth=M(0.25);c.strokeRect(M(x-3),M(32.5),M(6),M(7));col.forEach(([bx,by],d)=>bub(bx,by,String(d)));});
+  if(mode==='full'&&stu)drawPersonalV1(c,s,stu,0,0);
+  T('ظلّل كودك بالمربع الجانبي، ثم دائرة واحدة فقط لكل سؤال بقلم غامق، وامسح أي خطأ جيداً.',188,105,3,400,'right');
+  line(20,110,190,110);
+  L.q.forEach((q,i)=>{c.textBaseline='middle';T(String(i+1),q.numX,q.y+0.2,3,700,L.rtl?'left':'right','#000','ltr');c.textBaseline='alphabetic';q.bs.forEach(([x,y],k)=>bub(x,y,LT[k]));});
+  T('لا تطوِ الورقة ولا تكتب قرب المربعات السوداء',105,287,2.8,400,'center','#555');
+}
+function drawPersonalV1(c,s,stu,ox,oy){
+  const{T}=pen(c,s,ox,oy);c.textBaseline='alphabetic';
+  T('الاسم: '+stu.n,188,52,4.4,600,'right');
+  T('الكود: '+stu.c,188,63.5,4.6,700,'right');
+  c.font=`700 ${4.6*s}px ${FONT}`;c.direction='rtl';const tw=c.measureText('الكود: '+stu.c).width/s;
+  T('ظلّله بالمربع الجانبي',188-tw-4,63.5,3,400,'right','#666');
+  const L=layout({nq:0,no:4,letters:'latin',idd:4});
+  stu.c.split('').forEach((d,j)=>{if(L.id[j]){c.textBaseline='middle';T(d,L.id[j][0][0],36.2,4.2,600,'center','#555','ltr');c.textBaseline='alphabetic';}});
+}
+/* ---------- image analysis ---------- */
+function solve(A,b){const n=b.length,M=A.map((r,i)=>[...r,b[i]]);
+  for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;
+    const t=M[c];M[c]=M[p];M[p]=t;const d=M[c][c];if(Math.abs(d)<1e-12)throw new Error('geom');
+    for(let k=c;k<=n;k++)M[c][k]/=d;
+    for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f)for(let k=c;k<=n;k++)M[r][k]-=f*M[c][k];}}
+  return M.map(r=>r[n]);}
+function homography(src,dst){const A=[],b=[];
+  for(let i=0;i<4;i++){const[x,y]=src[i],[u,v]=dst[i];A.push([x,y,1,0,0,0,-u*x,-u*y]);b.push(u);A.push([0,0,0,x,y,1,-v*x,-v*y]);b.push(v);}
+  return solve(A,b);}
+
+function analyze(img,cfg){
+  const maxD=1700;let W=img.naturalWidth,H=img.naturalHeight;const sc=Math.min(1,maxD/Math.max(W,H));
+  const w=Math.max(1,Math.round(W*sc)),h=Math.max(1,Math.round(H*sc));
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const cx=cv.getContext('2d',{willReadFrequently:true});cx.drawImage(img,0,0,w,h);
+  const px=cx.getImageData(0,0,w,h).data,n=w*h,g=new Float32Array(n);
+  for(let i=0,j=0;i<n;i++,j+=4)g[i]=0.299*px[j]+0.587*px[j+1]+0.114*px[j+2];
+  const W1=w+1,I=new Float64Array(W1*(h+1));
+  for(let y=0;y<h;y++){let row=0;const o=(y+1)*W1,p=y*W1;for(let x=0;x<w;x++){row+=g[y*w+x];I[o+x+1]=I[p+x+1]+row;}}
+  const R=Math.max(10,Math.round(Math.max(w,h)/14)),dark=new Uint8Array(n);
+  for(let y=0;y<h;y++){const y0=Math.max(0,y-R),y1=Math.min(h,y+R+1);
+    for(let x=0;x<w;x++){const x0=Math.max(0,x-R),x1=Math.min(w,x+R+1);
+      const m=(I[y1*W1+x1]-I[y0*W1+x1]-I[y1*W1+x0]+I[y0*W1+x0])/((x1-x0)*(y1-y0));const v=g[y*w+x];
+      if(v<m*0.7&&v<190)dark[y*w+x]=1;}}
+  const lab=new Int32Array(n),st=new Int32Array(n),comps=[];
+  for(let i=0;i<n;i++){if(!dark[i]||lab[i])continue;const id=comps.length+1;let sp=0;st[sp++]=i;lab[i]=id;
+    let area=0,sx=0,sy=0,mnx=w,mny=h,mxx=0,mxy=0;
+    while(sp){const p=st[--sp],x=p%w,y=(p-x)/w;area++;sx+=x;sy+=y;
+      if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y;
+      let q;
+      if(x>0){q=p-1;if(dark[q]&&!lab[q]){lab[q]=id;st[sp++]=q;}}
+      if(x<w-1){q=p+1;if(dark[q]&&!lab[q]){lab[q]=id;st[sp++]=q;}}
+      if(y>0){q=p-w;if(dark[q]&&!lab[q]){lab[q]=id;st[sp++]=q;}}
+      if(y<h-1){q=p+w;if(dark[q]&&!lab[q]){lab[q]=id;st[sp++]=q;}}}
+    comps.push({area,cx:sx/area,cy:sy/area,mnx,mny,mxx,mxy});}
+  const md=Math.min(w,h),minS=Math.max(6,md*0.012),maxS=md*0.14;
+  const cands=comps.filter(c=>{const bw=c.mxx-c.mnx+1,bh=c.mxy-c.mny+1,fill=c.area/(bw*bh),asp=bw/bh;
+    return bw>=minS&&bh>=minS&&bw<=maxS&&bh<=maxS&&fill>0.6&&asp>0.55&&asp<1.8&&c.mnx>1&&c.mny>1&&c.mxx<w-2&&c.mxy<h-2;});
+  if(cands.length<4)throw new Error(TR('لم يُعثَر على المربعات السوداء الأربعة. صوّر الورقة كاملةً على سطح فاتح.','Could not find the four black squares. Photograph the whole sheet on a light surface.'));
+  const sorted=[...cands].sort((a,b)=>b.area-a.area),ref=sorted[3].area,big=cands.filter(c=>c.area>=ref*0.4);
+  const fns=[c=>c.cx+c.cy,c=>(w-c.cx)+c.cy,c=>(w-c.cx)+(h-c.cy),c=>c.cx+(h-c.cy)];
+  const pick=set=>fns.map(fn=>set.reduce((b,c)=>fn(c)<fn(b)?c:b));
+  let P=pick(big);if(new Set(P).size<4)P=pick(cands);
+  if(new Set(P).size<4)throw new Error(TR('تعذّر تحديد زوايا الورقة. أعد التصوير من الأعلى مباشرة.','Could not locate the sheet corners. Retake the photo straight from above.'));
+  const ip=P.map(c=>[c.cx,c.cy]);
+  const G=(X,Y)=>{let xi=Math.round(X),yi=Math.round(Y);if(xi<0)xi=0;else if(xi>=w)xi=w-1;if(yi<0)yi=0;else if(yi>=h)yi=h-1;return g[yi*w+xi];};
+  const map=(Hm,x,y)=>{const z=Hm[6]*x+Hm[7]*y+1;return[(Hm[0]*x+Hm[1]*y+Hm[2])/z,(Hm[3]*x+Hm[4]*y+Hm[5])/z];};
+  const meanAt=(Hm,x,y,rad)=>{let s=0,k=0;for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const dx=a/2*rad,dy=b/2*rad;if(dx*dx+dy*dy>rad*rad*1.05)continue;const[u,v]=map(Hm,x+dx,y+dy);s+=G(u,v);k++;}return s/k;};
+  let best=null;
+  for(let r=0;r<4;r++){const dst=MKC.map((_,i)=>ip[(i+r)%4]);let Hm;try{Hm=homography(MKC,dst);}catch(e){continue;}
+    const v=meanAt(Hm,ORI.x+ORI.s/2,ORI.y+ORI.s/2,1.6),pap=meanAt(Hm,PAP(cfg)[0],PAP(cfg)[1],2),score=v/Math.max(pap,1);
+    if(!best||score<best.score)best={Hm,score};}
+  if(!best)throw new Error(TR('تعذّر تحديد زوايا الورقة.','Could not locate the sheet corners.'));
+  const Hm=best.Hm,Lo=layout(cfg),rr=Lo.r*0.6;
+  const qv=Lo.q.map(q=>q.bs.map(([x,y])=>meanAt(Hm,x,y,rr)));
+  const iv=Lo.id.map(col=>col.map(([x,y])=>meanAt(Hm,x,y,Lo.idr*0.6)));
+  const fv=FB(cfg).map(([x,y])=>meanAt(Hm,x,y,FBR*0.6));
+  const all=[...qv.flat(),...iv.flat(),...fv].sort((a,b)=>a-b),paper=all[Math.floor(all.length*0.9)]||255;
+  const decide=vals=>{const ref=Math.max(Math.max(...vals),paper*0.85);
+    const dk=vals.map((v,i)=>[(ref-v)/Math.max(ref,1),i]).sort((a,b)=>b[0]-a[0]);const TH=0.3;
+    if(dk[0][0]<TH)return -1;
+    if(dk.length>1&&dk[1][0]>=TH)return (dk[0][0]-dk[1][0]>0.22)?dk[0][1]:-2;
+    return dk[0][1];};
+  const ans=qv.map(decide);
+  const id=iv.map(v=>{const a=decide(v);return a>=0?String(a):'?';}).join('');
+  // rectified image for review
+  const OS=3.6,ow=Math.round(210*OS),oh=Math.round(297*OS),oc=document.createElement('canvas');oc.width=ow;oc.height=oh;
+  const octx=oc.getContext('2d'),od=octx.createImageData(ow,oh),o=od.data;
+  for(let y=0;y<oh;y++){const my=(y+0.5)/OS;for(let x=0;x<ow;x++){const mx=(x+0.5)/OS,z=Hm[6]*mx+Hm[7]*my+1;
+    const sx=((Hm[0]*mx+Hm[1]*my+Hm[2])/z)|0,sy=((Hm[3]*mx+Hm[4]*my+Hm[5])/z)|0,k=(y*ow+x)*4;
+    if(sx<0||sy<0||sx>=w||sy>=h){o[k]=o[k+1]=o[k+2]=225;o[k+3]=255;continue;}
+    const j=(sy*w+sx)*4;o[k]=px[j];o[k+1]=px[j+1];o[k+2]=px[j+2];o[k+3]=255;}}
+  octx.putImageData(od,0,0);
+  const form=fv.length?decide(fv):0;
+  return {ans,id,form,url:oc.toDataURL('image/jpeg',0.78),oriWeak:best.score>0.6};
+}
+
+
+/* ---------- helpers ---------- */
+const toLatin=s=>String(s).replace(/[\u0660-\u0669]/g,d=>d.charCodeAt(0)-0x660).replace(/[\u06F0-\u06F9]/g,d=>d.charCodeAt(0)-0x6F0);
+const nameOf=(r,am)=>r.name||((am||allStudents())[r.id]||{}).n||'';
+function grade(r,ex){ex=ex||E();const KK=KEY(ex,r);let c=0,wr=0,b=0,m=0;for(let i=0;i<ex.nq;i++){const k=KK[i];if(k==null||k<0)continue;const a=r.ans[i];
+  if(a===k)c++;else if(a===-1)b++;else{wr++;if(a===-2)m++;}}
+  const keyed=c+wr+b,score=+(c*ex.pts).toFixed(2),total=+(keyed*ex.pts).toFixed(2);
+  return{c,w:wr,b,m,score,total,pct:total?Math.round(score/total*1000)/10:0};}
+const keyedCount=(ex,f)=>{ex=ex||E();const k=ex.keys[f==null?Math.min(KF,ex.forms-1):f]||ex.keys[0];return k.filter(x=>x>=0).length;};
+const minKeyed=ex=>Math.min(...ex.keys.map(k=>k.filter(x=>x>=0).length));
+const ansTxt=(a,ex)=>a===-1?TR('متروك','Blank'):a===-2?TR('أكثر من خيار','Multiple marks'):LET[ex.letters][a];
+const sortedResults=ex=>[...ex.results].sort((a,b)=>{const x=a.id||'',y=b.id||'';if(x!==y)return x.localeCompare(y,'en',{numeric:true});return(a.t||0)-(b.t||0);});
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
+function twoTap(btn,label,fn){if(btn.dataset.armed){delete btn.dataset.armed;btn.textContent=label;fn();return;}
+  btn.dataset.armed=1;btn.textContent=TR('اضغط مرة أخرى للتأكيد','Tap again to confirm');setTimeout(()=>{if(btn.dataset.armed){delete btn.dataset.armed;btn.textContent=label;}},3000);}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const safeFile=s=>s.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim();
+const tick=()=>new Promise(r=>setTimeout(r,20));
+
+/* inside a claude.ai page, files go through the viewer's downloads capability; elsewhere the normal download/share */
+let DLP=null;const dlCap=()=>DLP||(DLP=(window.claude&&typeof window.claude.use==='function')?Promise.resolve(window.claude.use('downloads')).catch(()=>null):Promise.resolve(null));
+dlCap();
+async function offer(filename,data,mime){
+  const blob=new Blob([data],{type:mime});
+  const dl=await dlCap();
+  if(dl){try{await dl.save({filename,data:blob});toast(TR('تم الحفظ','Saved'));}catch(e){if(e&&e.code==='declined')return;toast(TR('تعذّر حفظ الملف','Could not save the file'));}return;}
+  const mobile=matchMedia('(pointer:coarse)').matches;
+  if(mobile&&navigator.canShare){try{const file=new File([blob],filename,{type:mime});
+    if(navigator.canShare({files:[file]})){await navigator.share({files:[file],title:filename});return;}}
+    catch(e){if(e&&e.name==='AbortError')return;}}
+  try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);toast(TR('تم التنزيل','Downloaded'));}
+  catch(e){toast(TR('تعذّر تنزيل الملف','Could not download the file'));}}
+const XMIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+/* ---------- dates ---------- */
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const rDate=r=>r.d||(r.t?(()=>{const d=new Date(r.t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})():'');
+const fmtDate=d=>d?d.split('-').reverse().join('/'):'';
+
+/* ---------- saved scan images (IndexedDB, so the colored PDF keeps the real photo) ---------- */
+const dbp=new Promise(res=>{try{const q=indexedDB.open('omr-images',1);q.onupgradeneeded=()=>q.result.createObjectStore('img');q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});
+async function imgPut(k,v){const db=await dbp;if(!db)return;try{db.transaction('img','readwrite').objectStore('img').put(v,k);}catch(e){}}
+async function imgDel(k){const db=await dbp;if(!db)return;try{db.transaction('img','readwrite').objectStore('img').delete(k);}catch(e){}}
+async function imgLoadAll(){const db=await dbp;if(!db)return;await new Promise(res=>{try{const rq=db.transaction('img','readonly').objectStore('img').openCursor();
+  rq.onsuccess=()=>{const c=rq.result;if(c){IMG[c.key]=c.value;c.continue();}else res();};rq.onerror=()=>res();}catch(e){res();}});}
+
+/* ---------- graded (colored) sheet ---------- */
+const imgFrom=url=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
+async function gradedCanvas(r,ex,am){
+  const s=4,cv=document.createElement('canvas'),L=layout(ex),g=grade(r,ex),stu=am[r.id];
+  const url=IMG[r.uid];let scanned=false;
+  if(url){try{const im=await imgFrom(url);cv.width=Math.round(210*s);cv.height=Math.round(297*s);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);scanned=true;}catch(e){}}
+  if(!scanned){drawSheet(cv,s,ex,stu?'full':'generic',stu?{c:stu.c,n:stu.n}:null);
+    const c0=cv.getContext('2d');c0.fillStyle='#222';
+    L.q.forEach((q,i)=>{const a=r.ans[i];if(a>=0){c0.beginPath();c0.arc(q.bs[a][0]*s,q.bs[a][1]*s,L.r*0.85*s,0,Math.PI*2);c0.fill();}});
+    (r.id||'').split('').forEach((d,j)=>{if(L.id[j]&&/\d/.test(d)){const[b0,b1]=L.id[j][+d];c0.beginPath();c0.arc(b0*s,b1*s,L.idr*0.85*s,0,Math.PI*2);c0.fill();}});}
+  const c=cv.getContext('2d'),R=L.r*s,{T,W}=pen(c,s,0,0);
+  const ring=(x,y,col,wd,rad)=>{c.beginPath();c.arc(x*s,y*s,(rad||R)+wd*s*0.6,0,Math.PI*2);c.lineWidth=wd*s;c.strokeStyle=col;c.stroke();};
+  const dot=(x,y,col)=>{c.beginPath();c.arc(x*s,y*s,R*1.02,0,Math.PI*2);c.fillStyle=col;c.fill();};
+  const tickMark=(x,y,ok)=>{c.lineWidth=0.55*s;c.lineCap='round';c.strokeStyle=ok?'#1B7A4A':'#C0392B';c.beginPath();
+    if(ok){c.moveTo((x-1.3)*s,y*s);c.lineTo((x-0.3)*s,(y+1.1)*s);c.lineTo((x+1.5)*s,(y-1.3)*s);}
+    else{c.moveTo((x-1.1)*s,(y-1.1)*s);c.lineTo((x+1.1)*s,(y+1.1)*s);c.moveTo((x+1.1)*s,(y-1.1)*s);c.lineTo((x-1.1)*s,(y+1.1)*s);}c.stroke();c.lineCap='butt';};
+  const KK=KEY(ex,r);FB(ex).forEach(([x,y],f)=>{if(f===r.form)ring(x,y,'#2343C4',0.45,FBR*s);});
+  L.q.forEach((q,i)=>{const k=KK[i],a=r.ans[i];
+    if(a>=0)dot(q.bs[a][0],q.bs[a][1],k<0?'rgba(35,67,196,.55)':a===k?'rgba(27,150,80,.62)':'rgba(214,48,39,.66)');
+    if(a===-2)q.bs.forEach(b=>ring(b[0],b[1],'rgba(230,140,20,.95)',0.5));
+    if(k>=0&&a!==k)ring(q.bs[k][0],q.bs[k][1],'#1B9650',0.55);
+    if(k>=0){const tx=L.rtl?q.numX+L.tk:q.numX-L.tk;tickMark(tx,q.y,a===k);}});
+  (r.id||'').split('').forEach((d,j)=>{if(L.id[j]&&/\d/.test(d)){const[b0,b1]=L.id[j][+d];ring(b0,b1,'#2343C4',0.45,L.idr*s);}});
+  const pass=g.pct>=50,col=pass?'#1B7A4A':'#C0392B';
+  if(L.v2){c.fillStyle='rgba(255,255,255,.9)';c.fillRect((SB.x+0.3)*s,(SB.y+0.3)*s,(SB.w-0.6)*s,(SB.h-0.6)*s);
+    T('الدرجة',SB.x+SB.w-1.5,SB.y+3.6,2.6,600,'right','#000');c.textBaseline='middle';T(String(g.score),SB.x+SB.w/2+3,SB.y+SB.h/2+0.4,6.2,700,'center',col,'ltr');
+    T('/ '+g.total,SB.x+2,SB.y+SB.h/2+1.2,2.8,500,'left','#444','ltr');c.textBaseline='alphabetic';}
+  // result strip at the bottom
+  c.fillStyle='rgba(255,255,255,.94)';c.fillRect(STRIP.x*s,STRIP.y*s,STRIP.w*s,STRIP.h*s);
+  c.lineWidth=0.5*s;c.strokeStyle=col;c.strokeRect(STRIP.x*s,STRIP.y*s,STRIP.w*s,STRIP.h*s);
+  const nm=nameOf(r,am)||'بلا اسم';
+  T(`${nm}   —   الرمز: ${r.id||'؟'}`,STRIP.x+STRIP.w-3,STRIP.y+5.4,3.4,600,'right','#000');
+  T(`${ex.forms>1?'النموذج '+formTxt(ex,r)+'   ·   ':''}صحيح ${g.c}   ·   خطأ ${g.w}   ·   متروك ${g.b}   ·   النسبة ${g.pct}%   ·   تاريخ التصحيح ${fmtDate(rDate(r))}`,STRIP.x+STRIP.w-3,STRIP.y+11,2.8,400,'right','#333');
+  const sc=`${g.score} / ${g.total}`;T(sc,STRIP.x+3,STRIP.y+9.2,6,700,'left',col,'ltr');
+  return cv;
+}
+async function gradedPdf(ex,list,prog){
+  const am=allStudents(),pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+  for(let i=0;i<list.length;i++){if(i)pdf.addPage();const cv=await gradedCanvas(list[i],ex,am);
+    pdf.addImage(cv.toDataURL('image/jpeg',0.86),'JPEG',0,0,210,297,undefined,'FAST');
+    if(prog){prog(i+1,list.length);await tick();}}
+  return pdf.output('arraybuffer');}
+const PMIME='application/pdf';
+function readyPanel(p,files){
+  const canBoth=matchMedia('(pointer:coarse)').matches&&navigator.canShare&&(()=>{try{return navigator.canShare({files:files.map(f=>new File([f.data],f.name,{type:f.mime}))});}catch(e){return false;}})();
+  p.innerHTML='<b>'+TR('الملفان جاهزان.','Both files are ready.')+'</b><div class="row" style="margin-top:8px">'+(canBoth?'<button class="btn primary" data-i="all">'+TR('مشاركة الملفين أو حفظهما','Share or save both files')+'</button>':'')
+    +files.map((f,i)=>`<button class="btn${canBoth?'':' primary'}" data-i="${i}">${f.label}</button>`).join('')+'</div>';
+  p.onclick=async e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.i==='all'){try{await navigator.share({files:files.map(f=>new File([f.data],f.name,{type:f.mime})),title:files[0].name});}catch(err){}return;}
+    const f=files[+b.dataset.i];await offer(f.name,f.data,f.mime);};}
+
+
+/* ---------- auto-advance to the next step ---------- */
+if(S.autoNext==null)S.autoNext=true;
+const STEP_NAME={exam:['الامتحان','Exam'],scan:['التصحيح','Grading'],results:['النتائج','Results']};
+function renderAutoNext(){const b=$('#autoNext');b.setAttribute('aria-checked',String(!!S.autoNext));}
+$('#autoNext').addEventListener('click',()=>{S.autoNext=!S.autoNext;save();renderAutoNext();toast(S.autoNext?TR('سيُنقَل إلى الخطوة التالية تلقائياً','Auto-advance is on'):TR('أُوقف الانتقال التلقائي','Auto-advance is off'));});
+let autoT=null;
+function autoGo(from,to,delay){if(!S.autoNext||TAB!==from)return;clearTimeout(autoT);
+  toast(TR('اكتملت الصفحة، الانتقال إلى ','Page complete, moving to ')+TR(STEP_NAME[to][0],STEP_NAME[to][1])+'…');
+  autoT=setTimeout(()=>{if(TAB!==from||!$('#modal').hidden)return;showTab(to);const st=document.querySelector(`.step[data-tab="${to}"]`);if(st){st.classList.remove('autoflash');void st.offsetWidth;st.classList.add('autoflash');}},delay||1300);}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-next]');if(b){clearTimeout(autoT);goTab(b.dataset.next);}});
+
+/* ---------- warnings: field errors and step checks ---------- */
+function fieldErr(el,msg){const lab=el.closest('label.f')||el.parentElement;lab.classList.add('invalid');let m=lab.querySelector('.ferr');
+  if(!m){m=document.createElement('small');m.className='ferr';lab.appendChild(m);}m.textContent=msg;el.focus({preventScroll:true});el.scrollIntoView({block:'center',behavior:'smooth'});}
+document.addEventListener('input',e=>{const lab=e.target.closest&&e.target.closest('label.f.invalid');if(lab){lab.classList.remove('invalid');const m=lab.querySelector('.ferr');if(m)m.remove();}});
+let SHOWMISS=false;
+function guardDlg(kind,title,msg,btns){const g=$('#guard');g.className='guard'+(kind==='block'?' block':'');$('#gTitle').textContent=title;$('#gMsg').innerHTML=msg;
+  $('#gBtns').innerHTML=btns.map((b,i)=>`<button class="btn${b.primary?' primary':''}" data-i="${i}">${b.label}</button>`).join('');
+  $('#gBtns').onclick=e=>{const b=e.target.closest('button');if(!b)return;g.hidden=true;const f=btns[+b.dataset.i].fn;if(f)f();};g.hidden=false;$('#gBtns button').focus();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#guard').hidden)$('#guard').hidden=true;});
+const ORDER=['students','exam','scan','results'];
+function missingList(ex){const out=[];ex.keys.forEach((k,f)=>{const m=[];k.forEach((x,i)=>{if(x<0)m.push(i+1);});if(m.length)out.push({f,m});});return out;}
+function goTab(t,force){if(force||ORDER.indexOf(t)<=ORDER.indexOf(TAB)){showTab(t);return;}
+  const ex=E(),stepEl=document.querySelector(`.step[data-tab="${t}"]`),shake=()=>{if(stepEl){stepEl.classList.remove('blocked');void stepEl.offsetWidth;stepEl.classList.add('blocked');}};
+  // 1) students must exist before the exam step (warning, can continue)
+  const stuCount=ex?stageOf(ex.stage).students.length:activeStages().reduce((a,s)=>a+s.students.length,0);
+  const ackKey=ex?ex.stage:S.viewStage;goTab.ack=goTab.ack||{};
+  if(ORDER.indexOf(t)>=1&&!stuCount&&!goTab.ack[ackKey]){
+    guardDlg('warn',TR('لم تُدخَل أسماء الطلاب','No student names yet'),
+      TR('لم تُضِف أسماء طلاب لهذه المرحلة. يمكنك المتابعة وطباعة ورقة فارغة بلا اسم، لكن لن تُربَط الأوراق المصحَّحة بأسماء الطلاب.','You have not added any students for this stage. You can continue and print a blank sheet, but graded sheets will not be linked to student names.'),
+      [{label:TR('إدخال الأسماء','Add names'),primary:true,fn:()=>{showTab('students');setTimeout(()=>{const n=$('#namesInput');if(n&&!n.closest('[hidden]'))fieldErr(n,TR('أدخل اسماً واحداً على الأقل، كل اسم في سطر.','Enter at least one name, one per line.'));},100);}},
+       {label:TR('المتابعة دون أسماء','Continue without names'),fn:()=>{goTab.ack[ackKey]=true;goTab(t);}}]);shake();return;}
+  if(ORDER.indexOf(t)>=2&&ex){
+    // 2) the answer key must be complete before grading (blocking)
+    const miss=missingList(ex);
+    if(miss.length){const parts=miss.map(o=>(ex.forms>1?TR('النموذج ','Form ')+FORM_L[o.f]+': ':'')+(o.m.length>12?o.m.slice(0,12).join('، ')+TR(' وغيرها (',' and more (')+o.m.length+')':o.m.join('، ')));
+      guardDlg('block',TR('مفتاح الإجابة غير مكتمل','The answer key is incomplete'),
+        TR('لا يمكن الانتقال إلى التصحيح قبل تحديد الإجابة الصحيحة لكل سؤال. الأسئلة الناقصة: ','You cannot move to grading until every question has a correct answer. Missing questions: ')+'<b>'+esc(parts.join(' — '))+'</b>',
+        [{label:TR('إكمال المفتاح','Complete the key'),primary:true,fn:()=>{SHOWMISS=true;KF=miss[0].f;showTab('exam');setTimeout(()=>{const r=document.querySelector('#keyGrid .qrow.missing');if(r)r.scrollIntoView({block:'center',behavior:'smooth'});},120);}}]);shake();return;}
+    // 3) results need at least one graded sheet (blocking)
+    if(t==='results'&&!ex.results.length){
+      guardDlg('block',TR('لا توجد أوراق مصحَّحة','No graded sheets'),TR('صحّح ورقة واحدة على الأقل قبل الانتقال إلى النتائج.','Grade at least one sheet before opening the results.'),
+        [{label:TR('الذهاب إلى التصحيح','Go to grading'),primary:true,fn:()=>showTab('scan')}]);shake();return;}}
+  showTab(t);}
+
+/* ---------- tabs ---------- */
+let TAB='students';
+document.querySelectorAll('.step').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
+function showTab(t){clearTimeout(autoT);TAB=t;document.querySelectorAll('.step').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  const need=(t==='scan'||t==='results')&&!E();
+  ['students','exam','scan','results'].forEach(x=>$('#tab-'+x).hidden=x!==t||need);
+  $('#gate').hidden=!need;
+  if(t==='students')renderStudents();if(t==='exam')renderExam();if(t==='scan'&&!need)renderScan();if(t==='results'&&!need)renderResults();
+  window.scrollTo({top:0});}
+$('#gateBtn').addEventListener('click',()=>{showTab('exam');openNewExam();});
+function headLabel(){$('#examLabel').textContent=E()?examLabel(E()):TR('اختر امتحاناً أو أنشئ امتحاناً جديداً','Choose or create an exam');}
+
+/* ---------- students ---------- */
+function stageSeg(el,val,onPick){el.innerHTML=S.stages.filter(s=>!s.off||s.k===val).map(s=>`<button data-v="${s.k}" aria-pressed="${s.k===val}">${SS(s.k)}</button>`).join('');
+  el.onclick=e=>{const b=e.target.closest('button');if(b&&!b.disabled)onPick(b.dataset.v);};}
+function renderStudents(){
+  renderStageSetup();
+  const act=activeStages();$('#noStage').hidden=!!act.length;$('#stuBox').hidden=!act.length;if(!act.length)return;
+  let st=stageOf(S.viewStage);if(!st||st.off)st=act[0];S.viewStage=st.k;
+  stageSeg($('#stageSeg'),st.k,v=>{S.viewStage=v;save();renderStudents();});
+  $('#stName2').textContent=TR('طلاب '+SN(st.k),SN(st.k)+' students');
+  $('#stuCount').textContent=st.students.length?TR(`عدد الطلاب: ${st.students.length}، والرموز تبدأ من ${st.k}001`,`${st.students.length} students, codes from ${st.k}001`):TR('لا يوجد طلاب بعد. أضف الأسماء وسيُمنح كل طالب رمزاً تلقائياً.','No students yet. Add names and each student gets a code automatically.');
+  const list=[...st.students].sort((a,b)=>a.c.localeCompare(b.c));
+  $('#stuList').innerHTML=list.map(x=>`<div class="stu" data-c="${x.c}"><span class="code">${x.c}</span><input type="text" value="${esc(x.n)}" aria-label="${TR('اسم الطالب','Student name')} ${x.c}"><button class="x">${TR('حذف','Delete')}</button></div>`).join('');
+}
+function renderStageSetup(){
+  $('#stageSetup').innerHTML=S.stages.map(st=>{const n=st.students.length,ne=S.exams.filter(x=>x.stage===st.k).length;
+    return `<div class="stg${st.off?' off':''}" data-k="${st.k}"><div class="hd"><b>${esc(SN(st.k))}<small>${n?TR('الطلاب: '+n,n+' students'):TR('لا يوجد طلاب','no students')}${ne?' · '+TR('الامتحانات: '+ne,ne+' exam'+(ne>1?'s':'')):''}</small></b></div>
+      <button class="tg" aria-pressed="${!st.off}" data-act="tog">${st.off?TR('معطَّلة','Off'):TR('مفعَّلة','On')}<span class="sw" aria-hidden="true" aria-checked="${!st.off}"></span></button></div>`;}).join('');}
+function setStage(st,on){st.off=!on;if(on)S.viewStage=st.k;}
+$('#stageSetup').addEventListener('click',e=>{const box=e.target.closest('.stg');if(!box)return;const st=stageOf(box.dataset.k);setStage(st,!!st.off);save();renderStudents();headLabel();});
+$('#stAllOn').addEventListener('click',()=>{S.stages.forEach(st=>st.off=false);save();renderStudents();});
+$('#stAllOff').addEventListener('click',()=>{S.stages.forEach(st=>st.off=true);save();renderStudents();});
+function addNamesTo(st,names){const have=new Set(st.students.map(x=>x.n));let added=0,full=false;
+  names.map(n=>String(n).replace(/^\s*[\d\u0660-\u0669]+\s*[-.)،,:]?\s*/,'').replace(/\s+/g,' ').trim()).filter(n=>n.length>1).forEach(n=>{
+    if(have.has(n))return;const c=nextCode(st);if(!c){full=true;return;}st.students.push({c,n});have.add(n);added++;});
+  return{added,full};}
+function addNames(names){const st=stageOf(S.viewStage),{added,full}=addNamesTo(st,names);if(added)setTimeout(()=>autoGo('students','exam',1600),50);
+  save();renderStudents();toast(full?TR('بلغت المرحلة الحد الأقصى (999 طالباً)','This stage reached the 999-student limit'):added?TR(`تمت إضافة الطلاب: ${added}`,`Added ${added} students`):TR('الأسماء موجودة مسبقاً','These names are already in the list'));return added;}
+/* ---------- bulk import: all stages and their students from one Excel file ---------- */
+const AR_NORM=t=>String(t||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[\u064B-\u0652]/g,'').toLowerCase();
+function stageFromText(t){const x=AR_NORM(t);
+  if(/اولي|اول\b|first|1st/.test(x))return'1';if(/ثانيه|ثاني|second|2nd/.test(x))return'2';if(/ثالثه|ثالث|third|3rd/.test(x))return'3';if(/رابعه|رابع|fourth|4th/.test(x))return'4';
+  const y=toLatin(x).trim();if(/^[1-4]$/.test(y))return y;if(/مرحله|stage|level|صف/.test(y)){const d=y.match(/(^|\D)([1-4])(\D|$)/);if(d)return d[2];}return null;}
+const NAME_HDR=/^(الاسم|اسم الطالب|الاسم الثلاثي|الاسم الرباعي|اسم الطالب الثلاثي|اسم الطالب الرباعي|name|student name|student|الأسماء|اسماء الطلبة|اسم الطالبة)$/i;
+const STAGE_HDR=/^(المرحلة|المرحله|stage|level|الصف)$/i;
+function sheetRows(rows,fallbackK){
+  // find header row with a name column
+  let hi=-1,nc=-1,sc=-1;
+  for(let i=0;i<Math.min(rows.length,15)&&hi<0;i++)rows[i].forEach((v,j)=>{const t=String(v).trim();if(NAME_HDR.test(t)&&nc<0){nc=j;hi=i;}});
+  if(hi>=0)rows[hi].forEach((v,j)=>{if(STAGE_HDR.test(String(v).trim()))sc=j;});
+  const out=[];
+  rows.forEach((r,i)=>{if(i<=hi)return;let n='';
+    if(nc>=0)n=String(r[nc]||'').trim();
+    else{const cell=r.find(v=>typeof v==='string'&&/[\u0600-\u06FFA-Za-z]{2}/.test(v)&&!NAME_HDR.test(v.trim())&&!STAGE_HDR.test(v.trim())&&!stageFromText(v));n=cell?String(cell).trim():'';}
+    if(!n||!/[\u0600-\u06FFA-Za-z]{2}/.test(n))return;
+    const k=sc>=0?stageFromText(r[sc]):fallbackK;out.push({k,n});});
+  return out;}
+$('#xlsAll').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const box=$('#impRes');
+  if(!window.XLSX){toast(TR('تعذّر تحميل مكتبة Excel','The Excel library did not load'));return;}
+  try{const wb=/\.(csv|txt)$/i.test(f.name)?XLSX.read(await f.text(),{type:'string'}):XLSX.read(await f.arrayBuffer(),{type:'array'}),per={},skipped=[];
+    wb.SheetNames.forEach(nm=>{const rows=XLSX.utils.sheet_to_json(wb.Sheets[nm],{header:1,defval:''});if(!rows.length)return;
+      let k=stageFromText(nm);if(!k){for(let i=0;i<Math.min(rows.length,4)&&!k;i++)for(const v of rows[i]){const t=String(v);if(/مرحل|stage/i.test(t)){k=stageFromText(t);if(k)break;}}}
+      const list=sheetRows(rows,k);let used=0;
+      list.forEach(x=>{if(!x.k)return;(per[x.k]=per[x.k]||[]).push(x.n);used++;});
+      if(list.length&&!used)skipped.push(nm);});
+    const lines=[];let total=0;
+    Object.keys(per).sort().forEach(k=>{const st=stageOf(k),{added,full}=addNamesTo(st,per[k]);total+=added;if(per[k].length)st.off=false;
+      lines.push(`${SN(st.k)}: ${added?TR(`أُضيف من الطلاب: ${added}`,`added ${added} students`):TR('الأسماء موجودة مسبقاً','names already listed')} (${TR('المجموع','total')} ${st.students.length})${full?TR('، وبلغت الحد 999',', reached the 999 limit'):''}`);});
+    const k0=Object.keys(per).sort()[0];if(k0)S.viewStage=k0;save();renderStudents();headLabel();
+    if(!lines.length){box.innerHTML='<div class="imp bad">'+TR('لم يُعثَر على أسماء مرتبطة بمرحلة معروفة. اجعل اسم كل ورقة اسمَ المرحلة (مثل «المرحلة الأولى»)، أو أضف عمود «المرحلة».','No names with a recognisable stage were found. Name each sheet after its stage (for example "Stage 1"), or add a "Stage" column.')+'</div>';return;}
+    box.innerHTML=`<div class="imp"><b>${TR(`تم الرفع، عدد الطلاب الجدد: ${total}`,`Uploaded: ${total} new students`)}</b><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>${skipped.length?`<div style="color:var(--warn);margin-top:4px">${TR('لم تُعرَف مرحلة هذه الأوراق فلم تُضَف: ','Stage not recognised, so these sheets were skipped: ')}${skipped.map(esc).join(TR('، ',', '))}</div>`:''}</div>`;
+    toast(TR(`تمت إضافة الطلاب: ${total}`,`Added ${total} students`));if(total)setTimeout(()=>autoGo('students','exam',1800),50);}
+  catch(err){box.innerHTML='<div class="imp bad">'+TR('تعذّرت قراءة الملف.','Could not read the file.')+'</div>';}});
+$('#btnTpl').addEventListener('click',async()=>{if(!window.XLSX){toast(TR('تعذّر تحميل مكتبة Excel','The Excel library did not load'));return;}
+  const X=XLSX,wb=X.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+  ['1','2','3','4'].forEach(k=>{const ws=X.utils.aoa_to_sheet([[TR('ت','#'),TR('اسم الطالب','Student name')],[1,''],[2,''],[3,'']]);ws['!cols']=[{wch:5},{wch:36}];X.utils.book_append_sheet(wb,ws,SN(k));});
+  await offer(TR('نموذج المراحل والطلاب.xlsx','Stages and students template.xlsx'),X.write(wb,{bookType:'xlsx',type:'array'}),XMIME);});
+$('#btnAddNames').addEventListener('click',()=>{const v=$('#namesInput').value;if(!v.trim()){fieldErr($('#namesInput'),TR('اكتب اسماً واحداً على الأقل، كل اسم في سطر.','Type at least one name, one per line.'));return;}const n=addNames(v.split(/\r?\n/));if(n)$('#namesInput').value='';});
+$('#xlsIn').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(!window.XLSX){toast(TR('تعذّر تحميل مكتبة Excel','The Excel library did not load'));return;}
+  try{const wb=/\.(csv|txt)$/i.test(f.name)?XLSX.read(await f.text(),{type:'string'}):XLSX.read(await f.arrayBuffer(),{type:'array'}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+    const names=[];rows.forEach(r=>{const cell=r.find(v=>typeof v==='string'&&/[\u0600-\u06FFA-Za-z]{2}/.test(v)&&!/^(الاسم|اسم الطالب|name|الأسماء)$/i.test(v.trim()));if(cell)names.push(cell);});
+    if(!names.length){toast(TR('لم يُعثَر على أسماء في الملف','No names found in the file'));return;}addNames(names);}catch(err){toast(TR('تعذّرت قراءة الملف','Could not read the file'));}});
+$('#stuList').addEventListener('change',e=>{if(e.target.tagName!=='INPUT')return;const c=e.target.closest('.stu').dataset.c,st=stageOf(S.viewStage),x=st.students.find(s=>s.c===c);
+  if(x){x.n=e.target.value.trim()||x.n;save();}});
+$('#stuList').addEventListener('click',e=>{const b=e.target.closest('.x');if(!b)return;const c=b.closest('.stu').dataset.c;
+  if(!b.dataset.armed){b.dataset.armed=1;b.textContent=TR('تأكيد الحذف','Confirm delete');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=TR('حذف','Delete');}},3000);return;}
+  const st=stageOf(S.viewStage);st.students=st.students.filter(s=>s.c!==c);save();renderStudents();});
+$('#btnCodes').addEventListener('click',async()=>{if(!window.XLSX){toast(TR('تعذّر تحميل مكتبة Excel','The Excel library did not load'));return;}
+  const X=XLSX,wb=X.utils.book_new();wb.Workbook={Views:[{RTL:true}]};let any=false;
+  S.stages.forEach(st=>{const rows=[[SN(st.k)],[],[TR('ت','#'),TR('الرمز','Code'),TR('اسم الطالب','Student name')]];[...st.students].sort((a,b)=>a.c.localeCompare(b.c)).forEach((x,i)=>rows.push([i+1,x.c,x.n]));if(st.students.length)any=true;
+    const ws=X.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:5},{wch:10},{wch:34}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:2}}];X.utils.book_append_sheet(wb,ws,SN(st.k).slice(0,31));});
+  if(!any){toast(TR('أضف طلاباً أولاً','Add students first'));return;}
+  await offer(TR('رموز الطلاب.xlsx','Student codes.xlsx'),X.write(wb,{bookType:'xlsx',type:'array'}),XMIME);});
+
+/* ---------- exam ---------- */
+let neStage='2';
+function openNewExam(){const n=$('#newExam');n.hidden=false;neStage=(E()&&E().stage)||S.viewStage||'2';if(!stageOf(neStage)||stageOf(neStage).off)neStage=(activeStages()[0]||S.stages[0]).k;$('#neSub').value='';$('#neTitle').value='';renderNewExam();n.scrollIntoView({block:'nearest'});}
+function renderNewExam(){const act=activeStages();
+  if(!act.length){$('#neStage').innerHTML='<button disabled>'+TR('فعِّل مرحلة من قسم الطلاب أولاً','Enable a stage in Students first')+'</button>';$('#neCreate').disabled=true;return;}
+  $('#neCreate').disabled=false;if(!act.find(s=>s.k===neStage))neStage=act[0].k;
+  stageSeg($('#neStage'),neStage,v=>{neStage=v;renderNewExam();});
+  const used=[...new Set(S.exams.filter(x=>x.stage===neStage).map(x=>x.subject).filter(Boolean))];
+  $('#neSubList').innerHTML=used.map(x=>`<option value="${esc(x)}">`).join('');
+  if(!$('#neSub').value&&used.length)$('#neSub').value=used[used.length-1];}
+$('#btnNewExam').addEventListener('click',openNewExam);
+$('#neCancel').addEventListener('click',()=>$('#newExam').hidden=true);
+$('#neCreate').addEventListener('click',()=>{const neSub=$('#neSub').value.trim();if(!neSub){fieldErr($('#neSub'),TR('اسم المادة مطلوب.','The subject is required.'));return;}if(!activeStages().length)return;
+  const ex={id:'e'+Date.now().toString(36),stage:neStage,subject:neSub,title:$('#neTitle').value.trim(),nq:40,no:4,pts:1,letters:'latin',idd:4,ver:3,teachers:(S.inst.teachers||[]).slice(0,1),key:[],results:[],created:Date.now()};
+  fixKey(ex);S.exams.push(ex);S.cur=ex.id;save();$('#newExam').hidden=true;renderExam();toast(TR('تم إنشاء الامتحان','Exam created'));});
+$('#examSel').addEventListener('change',e=>{S.cur=e.target.value;save();renderExam();});
+function renderExam(){
+  headLabel();const ex=E();
+  $('#examSel').innerHTML=S.exams.length?[...S.exams].reverse().map(x=>`<option value="${x.id}"${x.id===S.cur?' selected':''}>${esc(examLabel(x))}</option>`).join(''):'<option>'+TR('لا توجد امتحانات','No exams')+'</option>';
+  $('#examSel').disabled=!S.exams.length;
+  $('#examBody').hidden=!ex;if(!$('#newExam').hidden)renderNewExam();if(!ex){if($('#newExam').hidden)openNewExam();return;}
+  const L=ex.results.length>0,st=stageOf(ex.stage);
+  $('#exInfo').innerHTML=`<span class="badge">${esc(SN(st.k))}</span> <span class="badge" dir="auto">${esc(ex.subject)}</span>`;
+  $('#cfTitle').value=ex.title;$('#cfNq').value=ex.nq;$('#cfPts').value=ex.pts;$('#cfNq').disabled=L;
+  document.querySelectorAll('#cfNo button').forEach(b=>{b.setAttribute('aria-pressed',+b.dataset.v===ex.no);b.disabled=L;});
+  document.querySelectorAll('#cfLet button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.v===ex.letters);b.disabled=L;});
+  document.querySelectorAll('#cfForms button').forEach(b=>{b.setAttribute('aria-pressed',+b.dataset.v===ex.forms);b.disabled=L||(!V2(ex)&&+b.dataset.v>1);});
+  $('#lockNote').hidden=!L;
+  const n=st.students.length;$('#btnPdfNames').textContent=n?TR(`أوراق بأسماء طلاب ${SN(st.k)} (عدد الأوراق: ${n})`,`Sheets for ${SN(st.k)} students (${n})`):TR(`أضف طلاب ${SN(st.k)} أولاً`,`Add ${SN(st.k)} students first`);$('#btnPdfNames').disabled=!n;
+  renderTeach();renderInst();drawPreview();renderKey();
+}
+function renderTeach(){const ex=E();if(!ex)return;const all=S.inst.teachers||[],sel=exTeachers(ex);
+  $('#cfTeach').innerHTML=all.map((t,i)=>`<button class="tchip" data-i="${i}" aria-pressed="${sel.includes(t)}">${esc(t)}</button>`).join('')
+    +`<button class="tchip" data-i="none" aria-pressed="${!sel.length}">${TR('بلا اسم','No name')}</button>`
+    +(all.length?'':'<span class="meter">'+TR('أضف الأسماء من بطاقة الترويسة أدناه.','Add names in the header card below.')+'</span>');}
+$('#cfTeach').addEventListener('click',e=>{const b=e.target.closest('.tchip'),ex=E();if(!b||!ex)return;const all=S.inst.teachers||[];
+  let sel=exTeachers(ex).slice();if(b.dataset.i==='none')sel=[];else{const t=all[+b.dataset.i];sel=sel.includes(t)?sel.filter(x=>x!==t):[...sel,t];}
+  ex.teachers=all.filter(t=>sel.includes(t));save();renderTeach();drawPreview();});
+function renderInst(){const I=INST(),ex=E();$('#inAr').value=(I.ar||[]).join('\n');$('#inEn').value=(I.en||[]).join('\n');$('#inTeacher').value=(I.teachers||[]).join('\n');$('#inYear').value=I.year||'';
+  const n=$('#v1Note');if(ex&&V2(ex)&&ex.ver<3&&!ex.results.length){n.hidden=false;n.innerHTML=TR('يتوفر توزيع أحدث للأسئلة يملأ الورقة حسب عددها. إن لم تكن قد طبعت أوراق هذا الامتحان بعد فحدّثه.','A newer layout spreads the questions over the whole sheet. If you have not printed this exam yet, update it.')+' <button class="btn" id="btnUpg" style="margin-top:8px">'+TR('تحديث التوزيع','Update layout')+'</button>';}
+  else if(ex&&!V2(ex)){n.hidden=false;
+    n.innerHTML=ex.results.length?TR('أُنشئ هذا الامتحان قبل التحديث، لذا يبقى بالتصميم القديم كي تُقرأ أوراقه المطبوعة. أما الامتحانات الجديدة فتُطبَع بالترويسة والشعار ومربع الرمز المصغَّر.','This exam was created before the update, so it keeps the old design and its printed sheets still read correctly. New exams use the header, logo and smaller code box.')
+      :TR('هذا الامتحان بالتصميم القديم. إن لم تكن قد طبعت أوراقه بعد، فحدّثه إلى التصميم الجديد.','This exam uses the old design. If you have not printed its sheets yet, switch it to the new design.')+' <button class="btn" id="btnUpg" style="margin-top:8px">'+TR('التحديث إلى التصميم الجديد','Switch to the new design')+'</button>';}else n.hidden=true;}
+$('#v1Note').addEventListener('click',e=>{if(e.target.id!=='btnUpg')return;const ex=E();if(!ex||ex.results.length)return;ex.ver=3;save();renderExam();toast(TR('أصبح الامتحان بالتصميم الجديد. اطبع أوراقه من جديد.','The exam now uses the new design. Print its sheets again.'));});
+const instSave=()=>{const I=INST(),lines=v=>v.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,5);
+  I.ar=lines($('#inAr').value);I.en=lines($('#inEn').value);{const old=I.teachers||[];I.teachers=$('#inTeacher').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);S.exams.forEach(x=>{if(Array.isArray(x.teachers))x.teachers=x.teachers.filter(t=>I.teachers.includes(t));});if(old.join('|')!==I.teachers.join('|'))renderTeach();}I.year=$('#inYear').value.trim();save();clearTimeout(instSave.t);instSave.t=setTimeout(drawPreview,250);};
+['#inAr','#inEn','#inTeacher','#inYear'].forEach(q=>$(q).addEventListener('input',instSave));
+$('#logoFile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const{im,u}=await loadImg(f);const mx=700,k=Math.min(1,mx/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');
+    cv.width=Math.round(im.naturalWidth*k);cv.height=Math.round(im.naturalHeight*k);const c=cv.getContext('2d');c.drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);
+    S.inst.logo=cv.toDataURL('image/png');save();loadLogo();toast(TR('تم تغيير الشعار','Logo changed'));}catch(err){toast(TR('تعذّر فتح الصورة','Could not open the image'));}});
+$('#logoReset').addEventListener('click',()=>{S.inst.logo='';save();loadLogo();toast(TR('أُعيد شعار جامعة التراث','Al-Turath University logo restored'));});
+$('#logoNone').addEventListener('click',()=>{S.inst.logo='none';save();loadLogo();toast(TR('أُزيل الشعار','Logo removed'));});
+function drawPreview(){const ex=E();if(!ex)return;const st=stageOf(ex.stage),s0=[...st.students].sort((a,b)=>a.c.localeCompare(b.c))[0];
+  drawSheet($('#sheetPreview'),3,ex,s0?'full':'generic',s0);}
+function clampInt(v,a,b,d){v=parseInt(toLatin(v),10);if(isNaN(v))return d;return Math.min(b,Math.max(a,v));}
+$('#cfTitle').addEventListener('input',e=>{E().title=e.target.value;save();headLabel();clearTimeout(drawPreview.t);drawPreview.t=setTimeout(()=>{drawPreview();renderExamSel();},300);});
+function renderExamSel(){[...$('#examSel').options].forEach(o=>{const x=S.exams.find(e=>e.id===o.value);if(x)o.textContent=examLabel(x);});}
+$('#cfNq').addEventListener('change',e=>{const ex=E();if(ex.results.length)return;const raw=parseInt(toLatin(e.target.value),10);if(!(raw>=1&&raw<=100)){fieldErr(e.target,TR('أدخل عدداً من 1 إلى 100.','Enter a number from 1 to 100.'));e.target.value=ex.nq;return;}ex.nq=clampInt(e.target.value,1,100,40);fixKey(ex);save();renderExam();});
+$('#cfPts').addEventListener('change',e=>{let v=parseFloat(toLatin(e.target.value));if(!(v>0)){fieldErr(e.target,TR('درجة السؤال يجب أن تكون أكبر من صفر.','Marks must be greater than zero.'));e.target.value=E().pts;return;}E().pts=v;save();e.target.value=v;});
+$('#cfNo').addEventListener('click',e=>{const b=e.target.closest('button'),ex=E();if(!b||ex.results.length)return;ex.no=+b.dataset.v;fixKey(ex);save();renderExam();});
+$('#cfForms').addEventListener('click',e=>{const b=e.target.closest('button'),ex=E();if(!b||ex.results.length)return;
+  if(!V2(ex)&&+b.dataset.v>1){toast(TR('النماذج المتعددة متاحة في التصميم الجديد فقط','Multiple forms need the new sheet design'));return;}
+  ex.forms=+b.dataset.v;fixKey(ex);KF=Math.min(KF,ex.forms-1);save();renderExam();});
+$('#cfLet').addEventListener('click',e=>{const b=e.target.closest('button'),ex=E();if(!b||ex.results.length)return;ex.letters=b.dataset.v;save();renderExam();});
+$('#btnDelExam').addEventListener('click',e=>twoTap(e.currentTarget,TR('حذف الامتحان','Delete exam'),()=>{const ex=E();ex.results.forEach(r=>{delete IMG[r.uid];imgDel(r.uid);});
+  S.exams=S.exams.filter(x=>x!==ex);S.cur=S.exams.length?S.exams[S.exams.length-1].id:null;save();renderExam();toast(TR('حُذف الامتحان','Exam deleted'));}));
+
+function optRow(i,sel,key,cls,ex){const LT=LET[ex.letters];let h=`<div class="qrow ${cls||''}" data-q="${i}"><span class="n">${i+1}</span><div class="opts ${ex.letters==='latin'?'ltr':''}">`;
+  for(let k=0;k<ex.no;k++)h+=`<button class="o${sel===k?' sel':''}${key===k?' key':''}" data-o="${k}" aria-label="${TR('سؤال','Question')} ${i+1} ${TR('خيار','option')} ${LT[k]}" aria-pressed="${sel===k}">${LT[k]}</button>`;
+  return h+'</div></div>';}
+function renderKey(){const ex=E();KF=Math.min(KF,ex.forms-1);const K=ex.keys[KF];
+  $('#kfBox').hidden=ex.forms<2;$('#kfSeg').innerHTML=ex.keys.map((k,f)=>`<button data-f="${f}" aria-pressed="${f===KF}">${FORM_L[f]} <small>(${k.filter(x=>x>=0).length}/${ex.nq})</small></button>`).join('');
+  let h='';for(let i=0;i<ex.nq;i++)h+=optRow(i,K[i],-1,SHOWMISS&&K[i]<0?'missing':'',ex);$('#keyGrid').innerHTML=h;keyMeter();}
+$('#kfSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;KF=+b.dataset.f;renderKey();});
+
+function keyMeter(){const ex=E();$('#kfSeg').querySelectorAll('button').forEach((b,f)=>{const sm=b.querySelector('small');if(sm)sm.textContent=`(${keyedCount(ex,f)}/${ex.nq})`;});$('#keyMeter').innerHTML=(ex.forms>1?TR('النموذج ','Form ')+FORM_L[KF]+' · ':'')+TR(`حُدِّد مفتاح <b>${keyedCount(ex)}</b> من أصل ${ex.nq} من الأسئلة`,`<b>${keyedCount(ex)}</b> of ${ex.nq} questions set`);}
+$('#keyGrid').addEventListener('click',e=>{const b=e.target.closest('.o');if(!b)return;const ex=E(),row=b.closest('.qrow'),i=+row.dataset.q,k=+b.dataset.o;
+  const K=ex.keys[KF],wasFull=minKeyed(ex)===ex.nq;if(SHOWMISS&&minKeyed(ex)===ex.nq)SHOWMISS=false;K[i]=K[i]===k?-1:k;save();if(!wasFull&&minKeyed(ex)===ex.nq)autoGo('exam','scan',1500);row.outerHTML=optRow(i,K[i],-1,'',ex);keyMeter();});
+$('#btnClearKey').addEventListener('click',e=>twoTap(e.currentTarget,TR('مسح المفتاح','Clear key'),()=>{const ex=E();ex.keys[KF]=ex.keys[KF].map(()=>-1);ex.key=ex.keys[0];save();renderKey();}));
+
+async function makePdf(btn,withNames){
+  const ex=E(),st=stageOf(ex.stage),p=$('#pdfProgress'),old=btn.textContent;
+  document.querySelectorAll('#btnPdfNames,#btnPdfBlank').forEach(b=>b.disabled=true);p.hidden=false;p.textContent=TR('جارٍ التجهيز…','Preparing…');
+  try{await document.fonts.ready;if(!window.jspdf)throw new Error('lib');
+    const R=11.811,pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    if(!withNames){const cv=document.createElement('canvas');drawSheet(cv,R,ex,'generic');pdf.addImage(cv.toDataURL('image/png'),'PNG',0,0,210,297,undefined,'FAST');}
+    else{const cv=document.createElement('canvas');drawSheet(cv,R,ex,'base');const base=cv.toDataURL('image/png');
+      const list=[...st.students].sort((a,b)=>a.c.localeCompare(b.c));
+      for(let i=0;i<list.length;i++){if(i)pdf.addPage();pdf.addImage(base,'PNG',0,0,210,297,'sheetbase','FAST');
+        const Z=PZ(ex);pdf.addImage(personalPNG(list[i],R,ex),'PNG',Z.x,Z.y,Z.w,Z.h,'p'+i,'FAST');
+        if(i%5===4){p.textContent=TR(`جارٍ تجهيز الورقة ${i+1} من ${list.length}…`,`Preparing sheet ${i+1} of ${list.length}…`);await tick();}}}
+    const nm=safeFile(`${withNames?TR('أوراق','Sheets'):TR('ورقة','Sheet')} ${SN(st.k)} ${ex.subject} ${ex.title||''}`)+'.pdf';
+    p.textContent=TR('الملف جاهز','File ready');await offer(nm,pdf.output('arraybuffer'),'application/pdf');p.hidden=true;}
+  catch(err){p.textContent=TR('تعذّر تجهيز الملف، حاول مرة أخرى.','Could not prepare the file. Try again.');}
+  renderExam();btn.textContent=old;}
+$('#btnPdfNames').addEventListener('click',e=>makePdf(e.currentTarget,true));
+$('#btnPdfBlank').addEventListener('click',e=>makePdf(e.currentTarget,false));
+
+/* ---------- scanning ---------- */
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>res({im,u});im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error(TR('تعذّر فتح الصورة','Could not open the image')));};im.src=u;});}
+$('#keyFile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const ex=E();
+  const p=$('#keyProgress');p.hidden=false;p.textContent=TR('جارٍ قراءة المفتاح…','Reading the key…');await tick();
+  try{const{im,u}=await loadImg(f);const r=analyze(im,ex);URL.revokeObjectURL(u);
+    if(ex.forms>1&&r.form>=0)KF=r.form;ex.keys[KF]=r.ans.map(a=>a>=0?a:-1);ex.key=ex.keys[0];save();renderKey();if(minKeyed(ex)===ex.nq&&!r.ans.some(a=>a===-2))autoGo('exam','scan',2500);const m=r.ans.filter(a=>a===-2).length;
+    p.textContent=TR(`قُرئ مفتاح ${keyedCount(ex)} من أصل ${ex.nq} من الأسئلة.`,`Read ${keyedCount(ex)} of ${ex.nq} questions.`)+(m?TR(` وظُلِّل أكثر من خيار في بعض الأسئلة (${m})، فحدّدها يدوياً.`,` ${m} question(s) have more than one mark; set them by hand.`):TR(' راجع المفتاح قبل التصحيح.',' Check the key before grading.'));}
+  catch(err){p.textContent=err.message||TR('تعذّرت القراءة','Could not read it');}});
+/* upload queue: every chosen photo gets a tile with its status, and the counts are shown on top */
+const Q={items:[],running:false,exId:null};
+const fkey=f=>[f.name,f.size,f.lastModified].join('|');
+function handleFiles(files){files=[...files].filter(f=>!f.type||f.type.startsWith('image/'));if(!files.length)return;const ex=E();
+  if(Q.exId!==ex.id){Q.items.forEach(it=>URL.revokeObjectURL(it.th));Q.items=[];Q.exId=ex.id;}
+  const seen=new Set(ex.results.map(r=>r.fk).filter(Boolean));Q.items.forEach(it=>seen.add(it.k));
+  files.forEach(f=>{const k=fkey(f),dup=seen.has(k);seen.add(k);Q.items.push({f,k,th:URL.createObjectURL(f),st:dup?'dup':'wait',msg:dup?TR('مرفوعة مسبقاً','Already uploaded'):TR('بالانتظار','Waiting')});});
+  renderQueue();runQueue();}
+async function runQueue(){if(Q.running)return;Q.running=true;const ex=E();
+  try{for(const it of Q.items){if(it.st!=='wait')continue;if(E()!==ex)break;it.st='run';it.msg=TR('جارٍ القراءة…','Reading…');renderQueue();await tick();
+    try{const{im,u}=await loadImg(it.f);const r=analyze(im,ex);URL.revokeObjectURL(u);
+      const uid=Date.now().toString(36)+Math.random().toString(36).slice(2,7);IMG[uid]=r.url;
+      const res={uid,id:r.id,name:'',ans:r.ans,t:Date.now(),d:$('#gDate').value||ex.gdate||today(),fk:it.k};res.form=r.form;ex.results.push(res);imgPut(uid,r.url);save();
+      const g=grade(res,ex),nm=nameOf(res);it.st='ok';it.uid=uid;it.msg=`${nm||TR('الرمز ','Code ')+(r.id||'?')}<br><b>${g.score} / ${g.total}</b>`;renderScan();}
+    catch(err){it.st='err';it.msg=err.message||TR('تعذّرت القراءة','Could not read it');}
+    renderQueue();}}
+  finally{Q.running=false;renderQueue();if(Q.items.some(i=>i.st==='ok')&&!Q.items.some(i=>i.st==='err'))autoGo('scan','results',2200);}}
+function renderQueue(){const ex=E(),box=$('#queue');if(!ex||Q.exId!==ex.id||!Q.items.length){box.hidden=true;return;}box.hidden=false;
+  const n=Q.items.length,c=k=>Q.items.filter(i=>i.st===k).length,ok=c('ok'),er=c('err'),dp=c('dup'),wt=c('wait')+c('run');
+  const st=stageOf(ex.stage).students.length,done=new Set(ex.results.map(r=>r.id)).size;
+  $('#qBar').innerHTML=`<span>${TR('الصور المرفوعة','Uploaded')}: <b>${n}</b></span><span class="ok">${TR('صُحِّحت','Graded')}: <b>${ok}</b></span>`+(wt?`<span class="wait">${TR('المتبقي','Remaining')}: <b>${wt}</b></span>`:'')
+    +(er?`<span class="bad">${TR('لم تُقرأ','Unreadable')}: <b>${er}</b></span>`:'')+(dp?`<span>${TR('مكررة','Duplicates')}: <b>${dp}</b></span>`:'')+(st?`<span>${TR('أوراق الامتحان','Exam sheets')}: <b>${ex.results.length}</b> ${TR('من أصل','of')} ${st}${TR('',' students')}</span>`:'');
+  $('#qGrid').innerHTML=Q.items.map((it,i)=>`<button class="qt ${it.st}" data-i="${i}" title="${esc(it.f.name||'')}"><img src="${it.th}" alt=""><span class="st">${it.st==='err'?esc(it.msg):it.msg}</span></button>`).join('');
+  const p=$('#scanProgress');if(wt){p.hidden=false;p.textContent=TR(`جارٍ تصحيح الصورة ${n-wt+1-dp} من ${n-dp}…`,`Grading photo ${n-wt+1-dp} of ${n-dp}…`);}else{p.hidden=false;p.textContent=ok?TR(`اكتمل التصحيح: صُحِّحت ${ok} من أصل ${n} من الصور.`,`Done: graded ${ok} of ${n} photos.`)+(er?TR(` وتعذّرت قراءة بعض الصور (${er})، فأعد تصويرها.`,` ${er} photo(s) could not be read; retake them.`):''):TR('لم تُقرأ أي صورة.','No photo could be read.');}}
+$('#qGrid').addEventListener('click',e=>{const b=e.target.closest('.qt');if(!b)return;const it=Q.items[+b.dataset.i];if(it&&it.st==='ok'&&it.uid)openReview(it.uid);else if(it&&it.st==='err')toast(it.msg);});
+$('#qClear').addEventListener('click',()=>{if(Q.running){toast(TR('انتظر حتى يكتمل التصحيح','Wait for grading to finish'));return;}Q.items.forEach(it=>URL.revokeObjectURL(it.th));Q.items=[];renderQueue();$('#scanProgress').hidden=true;});
+const drop=$('#drop');
+['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files)handleFiles(e.dataTransfer.files);});
+$('#gDate').addEventListener('change',e=>{const ex=E();if(!ex)return;ex.gdate=e.target.value||today();save();});
+$('#camFile').addEventListener('change',e=>{handleFiles(e.target.files);e.target.value='';});
+$('#galFile').addEventListener('change',e=>{handleFiles(e.target.files);e.target.value='';});
+
+function dupSet(ex){const c={},d=new Set();ex.results.forEach(r=>{if(r.id){c[r.id]=(c[r.id]||0)+1;if(c[r.id]>1)d.add(r.id);}});return d;}
+function flagsFor(r,ex,dups,am){const f=[];
+  if(!r.id||r.id.includes('?'))f.push(TR('الرمز غير واضح','Code unclear'));
+  else if(r.id[0]!==ex.stage)f.push(TR('رمز من مرحلة أخرى','Code from another stage'));
+  else if(!am[r.id])f.push(TR('رمز غير موجود في القائمة','Code not in the list'));
+  if(r.id&&dups.has(r.id))f.push(TR('رمز مكرر','Duplicate code'));
+  if(ex.forms>1&&!(r.form>=0&&r.form<ex.forms))f.push(TR('النموذج غير واضح (صُحِّح بالنموذج A)','Form unclear (graded as A)'));
+  const m=r.ans.filter(a=>a===-2).length;if(m)f.push(TR(`أكثر من خيار: ${m}`,`${m} multiple marks`));return f;}
+function renderScan(){
+  const ex=E();headLabel();$('#scanFor').textContent=TR('التصحيح: ','Grading: ')+examLabel(ex);$('#gDate').value=ex.gdate||today();renderQueue();
+  const kc=minKeyed(ex),w=$('#keyWarn');
+  if(kc<ex.nq){w.hidden=false;w.textContent=kc?TR(`المفتاح محدَّد لـ ${kc} من أصل ${ex.nq} من الأسئلة، ولا تُحتسَب الأسئلة التي ليس لها مفتاح.`,`The key covers ${kc} of ${ex.nq} questions. Questions without a key are not counted.`):TR('لم يُحدَّد مفتاح الإجابة بعد. يمكنك التصحيح الآن، وستُحتسَب الدرجات تلقائياً عند إكمال المفتاح.','No answer key yet. You can grade now; scores are calculated once the key is complete.');}else w.hidden=true;
+  const am=allStudents(),d=dupSet(ex),list=[...ex.results].reverse();
+  $('#scanCount').textContent=(TR('الأوراق المصحَّحة','Graded sheets'))+(ex.results.length?` (${ex.results.length})`:'');
+  if(!list.length){$('#scanList').innerHTML='<div class="empty">'+TR('تظهر هنا كل ورقة تصحّحها مع درجتها.','Each sheet you grade appears here with its score.')+'</div>';return;}
+  $('#scanList').innerHTML=list.map(r=>{const g=grade(r,ex),f=flagsFor(r,ex,d,am),nm=nameOf(r,am);
+    return `<button class="item" data-uid="${r.uid}">${IMG[r.uid]?`<img class="thumb" src="${IMG[r.uid]}" alt="">`:'<span class="thumb"></span>'}
+    <span class="who"><b>${esc(nm||TR('بلا اسم','No name'))}</b><span>${TR('الرمز','Code')}: ${esc(r.id||'?')} · ${fmtDate(rDate(r))}</span>${f.length?`<span class="flags">${f.map(x=>`<span class="flag">${x}</span>`).join('')}</span>`:''}</span>
+    <span class="score">${g.score}<small> / ${g.total}</small></span></button>`;}).join('');}
+$('#scanList').addEventListener('click',e=>{const b=e.target.closest('.item');if(b)openReview(b.dataset.uid);});
+
+/* ---------- results ---------- */
+function absentees(ex){const seen=new Set(ex.results.map(r=>r.id));return[...stageOf(ex.stage).students].sort((a,b)=>a.c.localeCompare(b.c)).filter(s=>!seen.has(s.c));}
+function renderResults(){
+  const ex=E();headLabel();const rs=sortedResults(ex),am=allStudents(),gs=rs.map(r=>grade(r,ex));
+  const tot=+(keyedCount(ex)*ex.pts).toFixed(2),sc=gs.map(g=>g.score);
+  const avg=sc.length?(sc.reduce((a,b)=>a+b,0)/sc.length):0,pass=gs.filter(g=>g.pct>=50).length;
+  const st=[[rs.length,TR('ورقة','sheets')],[sc.length?(+avg.toFixed(1)):'-',TR('المعدل من ','average of ')+tot],[sc.length?Math.max(...sc):'-',TR('أعلى درجة','highest')],[sc.length?Math.min(...sc):'-',TR('أدنى درجة','lowest')],[sc.length?pass:'-',TR('ناجح (50% فأكثر)','passed (50%+)')]];
+  $('#stats').innerHTML=st.map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  $('#resEmpty').hidden=!!rs.length;
+  $('#resBody').innerHTML=rs.map((r,i)=>{const g=gs[i];return `<tr data-uid="${r.uid}"><td class="num">${i+1}</td><td class="num">${esc(r.id||'-')}${ex.forms>1?` <span class="badge">${formTxt(ex,r)}</span>`:''}</td><td>${esc(nameOf(r,am)||TR('بلا اسم','No name'))}</td><td class="num">${g.c}</td><td class="num">${g.w}</td><td class="num">${g.b}</td><td class="num"><b>${g.score}</b></td><td class="num">${g.pct}</td><td class="num">${fmtDate(rDate(r))}</td></tr>`;}).join('');
+  const ab=absentees(ex);$('#absCard').hidden=!ab.length||!rs.length;$('#absList').innerHTML=ab.map(s=>`<span>${s.c} ${esc(s.n)}</span>`).join('');
+  let h='';for(let f=0;f<ex.forms;f++){const K=ex.keys[f],rf=ex.forms>1?rs.filter(r=>(r.form>=0&&r.form<ex.forms?r.form:0)===f):rs;let hb='';
+   for(let i=0;i<ex.nq;i++){const k=K[i];if(k<0)continue;const c=rf.filter(r=>r.ans[i]===k).length,p=rf.length?Math.round(c/rf.length*100):0;
+    const col=p<40?'var(--bad)':p<70?'var(--warn)':'var(--ok)';
+    hb+=`<div class="bar"><span class="n">${TR('س','Q')}${i+1}</span><span class="track"><span class="fill" style="width:${p}%;background:${col};display:block"></span></span><span class="p">${rf.length?p+'%':'-'}</span></div>`;}
+   if(hb)h+=(ex.forms>1?`<h3 style="grid-column:1/-1;margin:10px 0 2px;font-size:.95rem">${TR('النموذج','Form')} ${FORM_L[f]} <small style="color:var(--muted);font-weight:400">(${rf.length} ${TR('ورقة','sheets')})</small></h3>`:'')+hb;}
+  $('#bars').innerHTML=h||'<div class="empty">'+TR('حدّد مفتاح الإجابة ليظهر التحليل.','Set the answer key to see the analysis.')+'</div>';}
+$('#resBody').addEventListener('click',e=>{const t=e.target.closest('tr');if(t)openReview(t.dataset.uid);});
+$('#btnXlsx').addEventListener('click',async()=>{const ex=E();if(!ex.results.length){toast(TR('لم تُصحَّح أي ورقة بعد','No sheets graded yet'));return;}
+  if(!window.XLSX){toast(TR('تعذّر تحميل مكتبة Excel','The Excel library did not load'));return;}
+  try{await offer(safeFile(`${TR('درجات','Grades')} ${SN(ex.stage)} ${ex.subject} ${ex.title||''}`)+'.xlsx',buildXlsx(ex),XMIME);}catch(e){toast(TR('تعذّر تجهيز ملف Excel','Could not prepare the Excel file'));}});
+async function downloadBoth(prog){const ex=E();if(!ex.results.length){toast(TR('لم تُصحَّح أي ورقة بعد','No sheets graded yet'));return;}
+  if(!window.XLSX||!window.jspdf){toast(TR('تعذّر تحميل المكتبات','The libraries did not load'));return;}
+  const p=$(prog);p.hidden=false;document.querySelectorAll('#btnBoth,#btnBoth2').forEach(b=>b.disabled=true);
+  try{const base=safeFile(`${SN(ex.stage)} ${ex.subject} ${ex.title||''}`),list=sortedResults(ex);
+    const pdf=await gradedPdf(ex,list,(i,n)=>p.textContent=TR(`جارٍ تلوين الورقة ${i} من ${n}…`,`Coloring sheet ${i} of ${n}…`));
+    p.textContent=TR('جارٍ تجهيز ملف Excel…','Preparing Excel…');await tick();const xl=buildXlsx(ex);
+    readyPanel(p,[{name:TR('أوراق مصححة ','Graded sheets ')+base+'.pdf',data:pdf,mime:PMIME,label:TR('تنزيل الأوراق الملوّنة PDF','Download colored PDF')},{name:TR('درجات ','Grades ')+base+'.xlsx',data:xl,mime:XMIME,label:TR('تنزيل Excel','Download Excel')}]);}
+  catch(err){p.textContent=TR('تعذّر تجهيز الملفات، حاول مرة أخرى.','Could not prepare the files. Try again.');}
+  document.querySelectorAll('#btnBoth,#btnBoth2').forEach(b=>b.disabled=false);}
+$('#btnBoth').addEventListener('click',()=>downloadBoth('#bothProgress'));
+$('#btnBoth2').addEventListener('click',()=>downloadBoth('#bothProgress2'));
+function buildXlsx(ex){
+  const X=window.XLSX,LT=LET[ex.letters],am=allStudents(),rs=sortedResults(ex),gs=rs.map(r=>grade(r,ex)),stn=SN(ex.stage);
+  const total=+(keyedCount(ex)*ex.pts).toFixed(2),wb=X.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+  const I=INST(),HL=LANG==='en'?(I.en&&I.en.length?I.en:I.ar):I.ar,hd=[HL[2],HL[3]].filter(Boolean).join(' - '),dts=[...new Set(rs.map(rDate).filter(Boolean))].map(fmtDate);
+  const C=TR('، ',', '),rows=[[hd||TR('نتائج الامتحان','Exam results')],[HL[4]||''],[`${stn}${C}${ex.subject}${ex.title?C+ex.title:''}`],[`${TR('التدريسي','Teacher')}: ${exTeachers(ex).join(C)}`,'','','',`${TR('العام الدراسي','Academic year')}: ${I.year||''}`,'','',`${TR('تاريخ التصحيح','Grading date')}: ${dts.join(C)}`],[],[TR('ت','#'),TR('الرمز','Code'),TR('اسم الطالب','Student name'),TR('الصحيحة','Correct'),TR('الخاطئة','Wrong'),TR('المتروكة','Blank'),TR('الدرجة من ','Score out of ')+total,TR('النسبة %','Percent %'),TR('تاريخ التصحيح','Grading date'),TR('ملاحظة','Note'),...(ex.forms>1?[TR('النموذج','Form')]:[])]];
+  const d=dupSet(ex);
+  rs.forEach((r,i)=>{const g=gs[i];rows.push([i+1,r.id||'',nameOf(r,am),g.c,g.w,g.b,g.score,g.pct,fmtDate(rDate(r)),flagsFor(r,ex,d,am).join(TR('، ',', ')),...(ex.forms>1?[formTxt(ex,r)]:[])]);});
+  if(gs.length){const sc=gs.map(g=>g.score);rows.push([]);rows.push(['','',TR('المعدل','Average'),'','','',+(sc.reduce((a,b)=>a+b,0)/sc.length).toFixed(2)]);rows.push(['','',TR('أعلى درجة','Highest'),'','','',Math.max(...sc)]);rows.push(['','',TR('أدنى درجة','Lowest'),'','','',Math.min(...sc)]);}
+  const ws=X.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:5},{wch:9},{wch:30},{wch:9},{wch:9},{wch:9},{wch:13},{wch:10},{wch:14},{wch:24}];ws['!merges']=[0,1,2].map(r=>({s:{r,c:0},e:{r,c:9}})).concat([{s:{r:3,c:0},e:{r:3,c:3}},{s:{r:3,c:4},e:{r:3,c:6}},{s:{r:3,c:7},e:{r:3,c:9}}]);
+  const SH1=TR('الدرجات','Grades'),SH2=TR('تحليل الأسئلة','Question analysis'),SH3=TR('الغائبون','Absent');X.utils.book_append_sheet(wb,ws,SH1);
+  const ah=[TR('السؤال','Question'),TR('الإجابة الصحيحة','Right answer'),TR('عدد الصحيح','Correct count'),TR('نسبة الصحيح %','Correct %')];for(let k=0;k<ex.no;k++)ah.push(TR('اختاروا ','Chose ')+LT[k]);ah.push(TR('متروك','Blank'),TR('أكثر من خيار','Multiple marks'));
+  if(ex.forms>1)ah.unshift(TR('النموذج','Form'));
+  const ar=[ah];for(let f=0;f<ex.forms;f++){const K=ex.keys[f],rf=ex.forms>1?rs.filter(r=>(r.form>=0&&r.form<ex.forms?r.form:0)===f):rs;
+   for(let i=0;i<ex.nq;i++){const k=K[i],cnt=Array(ex.no).fill(0);let bl=0,mu=0;
+    rf.forEach(r=>{const a=r.ans[i];if(a>=0)cnt[a]++;else if(a===-1)bl++;else mu++;});
+    const c=k>=0?cnt[k]:'';ar.push([...(ex.forms>1?[FORM_L[f]]:[]),i+1,k>=0?LT[k]:TR('بلا مفتاح','No key'),c,k>=0&&rf.length?Math.round(c/rf.length*1000)/10:'',...cnt,bl,mu]);}}
+  const wa=X.utils.aoa_to_sheet(ar);wa['!cols']=ah.map((_,i)=>({wch:i<4?14:10}));X.utils.book_append_sheet(wb,wa,SH2);
+  const ab=absentees(ex),wab=X.utils.aoa_to_sheet([[TR('ت','#'),TR('الرمز','Code'),TR('اسم الطالب','Student name')],...ab.map((s,i)=>[i+1,s.c,s.n])]);wab['!cols']=[{wch:5},{wch:9},{wch:30}];X.utils.book_append_sheet(wb,wab,SH3);
+  const used=new Set([SH1,SH2,SH3]);
+  rs.forEach((r,i)=>{const g=gs[i],nm0=nameOf(r,am)||TR('طالب','Student');
+    let nm=(`${r.id||i+1} ${nm0}`).replace(/[\\\/\?\*\[\]:']/g,' ').replace(/\s+/g,' ').trim().slice(0,31).trim(),base=nm,n=2;
+    while(used.has(nm)){nm=base.slice(0,27).trim()+' '+(n++);}used.add(nm);
+    const a=[[TR('اسم الطالب','Student name'),nameOf(r,am)],[TR('الرمز','Code'),r.id||''],[TR('المرحلة','Stage'),stn],[TR('المادة','Subject'),ex.subject],[TR('الدرجة','Score'),g.score,TR('من','of'),total],[TR('النسبة %','Percent %'),g.pct],[TR('تاريخ التصحيح','Grading date'),fmtDate(rDate(r))],[TR('صحيح','Correct'),g.c,TR('خطأ','Wrong'),g.w,TR('متروك','Blank'),g.b],[],[TR('السؤال','Question'),TR('إجابة الطالب','Student answer'),TR('الإجابة الصحيحة','Right answer'),TR('النتيجة','Result')]];
+    const KK=KEY(ex,r);if(ex.forms>1)a.splice(4,0,[TR('النموذج','Form'),formTxt(ex,r)]);for(let q=0;q<ex.nq;q++){const k=KK[q],x=r.ans[q];a.push([q+1,ansTxt(x,ex),k>=0?LT[k]:'-',k<0?TR('بلا مفتاح','No key'):x===k?TR('صحيح','Correct'):x===-1?TR('متروك','Blank'):TR('خطأ','Wrong')]);}
+    const s=X.utils.aoa_to_sheet(a);s['!cols']=[{wch:16},{wch:18},{wch:16},{wch:12},{wch:8},{wch:8}];X.utils.book_append_sheet(wb,s,nm);});
+  return X.write(wb,{bookType:'xlsx',type:'array'});}
+
+/* ---------- review modal ---------- */
+let cur=null;
+function openReview(uid){const r=E().results.find(x=>x.uid===uid);if(!r)return;cur=r;
+  $('#rvId').value=r.id||'';$('#rvDate').value=rDate(r);rvName();$('#modal').hidden=false;document.body.style.overflow='hidden';drawReview();renderRvGrid();}
+function rvName(){const n=nameOf(cur);$('#rvName').textContent=n||TR('الرمز غير موجود في قائمة الطلاب','Code not in the student list');$('#rvName').style.color=n?'var(--ink)':'var(--warn)';}
+function closeReview(){$('#modal').hidden=true;document.body.style.overflow='';cur=null;if(TAB==='scan')renderScan();if(TAB==='results')renderResults();}
+function renderRvGrid(){const r=cur,ex=E();$('#rvFormBox').hidden=ex.forms<2;
+  $('#rvForm').innerHTML=Array.from({length:ex.forms},(_,f)=>`<button data-f="${f}" aria-pressed="${r.form===f}">${FORM_L[f]}</button>`).join('');
+  const KK=KEY(ex,r);let h='';for(let i=0;i<ex.nq;i++){const k=KK[i],a=r.ans[i];
+  h+=optRow(i,a,k,a===-2?'multi':a===-1?'blank':k<0?'':a===k?'good':'bad',ex);}
+  $('#rvGrid').innerHTML=h;const g=grade(r,ex);$('#rvScore').innerHTML=`${g.score}<small> / ${g.total}  (${g.pct}%)</small>`;}
+function drawReview(){const r=cur,ex=E(),cv=$('#rvCanvas'),url=IMG[r.uid];$('#rvNoImg').hidden=!!url;cv.hidden=!url;if(!url)return;
+  const im=new Image();im.onload=()=>{if(cur!==r)return;cv.width=im.width;cv.height=im.height;const c=cv.getContext('2d');c.drawImage(im,0,0);
+    const s=im.width/210,L=layout(ex),R=L.r*s;
+    const ring=(x,y,col,wd)=>{c.beginPath();c.arc(x*s,y*s,R+wd*s*0.6,0,Math.PI*2);c.lineWidth=wd*s;c.strokeStyle=col;c.stroke();};
+    const dot=(x,y,col)=>{c.beginPath();c.arc(x*s,y*s,R*0.95,0,Math.PI*2);c.fillStyle=col;c.fill();};
+    const KK=KEY(ex,r);FB(ex).forEach(([x,y],f)=>{if(f===r.form){c.beginPath();c.arc(x*s,y*s,(FBR+0.35)*s,0,Math.PI*2);c.lineWidth=0.55*s;c.strokeStyle='#2343C4';c.stroke();}});
+    L.q.forEach((q,i)=>{const k=KK[i],a=r.ans[i];
+      if(a>=0)dot(q.bs[a][0],q.bs[a][1],k<0?'rgba(35,67,196,.5)':a===k?'rgba(27,122,74,.55)':'rgba(192,57,43,.6)');
+      if(a===-2)q.bs.forEach(b=>ring(b[0],b[1],'rgba(214,138,30,.95)',0.5));
+      if(k>=0&&a!==k)ring(q.bs[k][0],q.bs[k][1],'#1B7A4A',0.6);});
+    (r.id||'').split('').forEach((d,j)=>{if(L.id[j]&&/\d/.test(d)){const[b0,b1]=L.id[j][+d];c.beginPath();c.arc(b0*s,b1*s,L.idr*s+0.55*s*0.6,0,Math.PI*2);c.lineWidth=0.55*s;c.strokeStyle='#2343C4';c.stroke();}});};
+  im.src=url;}
+$('#rvForm').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!cur)return;cur.form=+b.dataset.f;save();renderRvGrid();drawReview();});
+$('#rvGrid').addEventListener('click',e=>{const b=e.target.closest('.o');if(!b||!cur)return;const i=+b.closest('.qrow').dataset.q,k=+b.dataset.o;
+  cur.ans[i]=cur.ans[i]===k?-1:k;save();renderRvGrid();drawReview();});
+$('#rvId').addEventListener('input',e=>{if(!cur)return;cur.id=toLatin(e.target.value).replace(/\D/g,'').slice(0,4);save();rvName();drawReview();});
+$('#rvDate').addEventListener('change',e=>{if(!cur)return;cur.d=e.target.value||rDate(cur);save();});
+$('#rvPdf').addEventListener('click',async e=>{if(!cur)return;const b=e.currentTarget,ex=E(),r=cur;if(!window.jspdf){toast(TR('تعذّر تحميل مكتبة PDF','The PDF library did not load'));return;}b.disabled=true;
+  try{const data=await gradedPdf(ex,[r]);const nm=safeFile(`${r.id||''} ${nameOf(r)||TR('طالب','Student')} ${ex.subject} ${ex.title||''} ${TR('مصحح','graded')}`)+'.pdf';await offer(nm,data,PMIME);}catch(err){toast(TR('تعذّر تجهيز ملف PDF','Could not prepare the PDF'));}b.disabled=false;});
+$('#rvClose').addEventListener('click',closeReview);
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeReview();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)closeReview();});
+$('#rvDelete').addEventListener('click',e=>twoTap(e.currentTarget,TR('حذف الورقة','Delete sheet'),()=>{if(!cur)return;const ex=E();ex.results=ex.results.filter(x=>x!==cur);delete IMG[cur.uid];imgDel(cur.uid);save();closeReview();toast(TR('حُذفت الورقة','Sheet deleted'));}));
+
+/* ---------- install & offline ---------- */
+let deferred=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('#btnInstall').hidden=false;});
+$('#btnInstall').addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice;}catch(e){}deferred=null;$('#btnInstall').hidden=true;});
+window.addEventListener('appinstalled',()=>{$('#btnInstall').hidden=true;toast(TR('تم تثبيت التطبيق','App installed'));});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+
+/* ---------- init ---------- */
+$('#btnLang').addEventListener('click',()=>{LANG=LANG==='en'?'ar':'en';try{localStorage.setItem('omr-lang',LANG);}catch(e){}
+  applyLang();headLabel();showTab(TAB);if(cur){rvName();renderRvGrid();}});
+renderAutoNext();
+loadLogo();
+imgLoadAll().then(()=>{if(TAB==='scan'&&E())renderScan();});
+headLabel();
+const anyStu=S.stages.some(s=>s.students.length);
+showTab(E()?'exam':anyStu?'exam':'students');
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(TAB==='exam')drawPreview();});
+})();
+</script></body></html>
